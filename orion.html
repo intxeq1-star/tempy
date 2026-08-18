@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Orion 41 — Maison Vérault</title>
+  <meta name="description" content="Orion 41. Champagne gold, alligator, forty-one millimeters of quiet. Packed by the house." />
+  <meta name="theme-color" content="#080808" />
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="js/vendor/lenis.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/pages.css" />
+</head>
+<body>
+  <div class="cursor" aria-hidden="true"><div class="cursor-dot"></div><div class="cursor-ring"></div><span class="cursor-label"></span></div>
+  <div class="progress" aria-hidden="true"><i></i></div>
+  <div class="loader" id="loader"><div class="loader-inner"><p class="loader-mark">V</p><div class="loader-line"><span></span></div><p class="loader-count" id="loaderCount">000</p><p class="loader-word">Orion 41</p></div></div>
+  <header class="nav" id="nav">
+    <button class="nav-btn" id="menuBtn" type="button" aria-label="Open menu" data-cursor="menu"><span></span><span></span></button>
+    <a class="nav-logo" href="index.html">Vérault</a>
+    <a class="nav-cta magnetic" href="salon.html" data-cursor="enter">Request access</a>
+  </header>
+  <div class="menu" id="menu" hidden>
+    <nav class="menu-nav">
+      <a href="maison.html" data-index="01">The House</a>
+      <a href="index.html#pack" data-index="02">The Coffret</a>
+      <a href="collection.html" data-index="03">Collection</a>
+      <a href="atelier.html" data-index="04">Atelier</a>
+      <a href="journal.html" data-index="05">Journal</a>
+      <a href="salon.html" data-index="06">Private Salon</a>
+    </nav>
+  </div>
+  <main>
+    <article class="product-hero">
+      <img src="assets/images/watch-orion.jpg" alt="Orion 41 champagne gold watch" />
+      <div class="product-copy">
+        <p class="crumb"><a href="collection.html">Collection</a> · 01</p>
+        <h1 class="display">Orion 41</h1>
+        <p class="lede">The piece that falls. Champagne gold, a black sunburst that keeps its own weather, a strap cut from alligator that has already forgotten the river.</p>
+        <ul class="note-list">
+          <li>Calibre V-41, manual, 72 hours</li>
+          <li>41 mm champagne gold, sapphire both sides</li>
+          <li>Packed in a coffret that closes itself</li>
+          <li>Twelve this year. Then the bench goes dark.</li>
+        </ul>
+        <a class="btn magnetic" href="index.html#pack" data-cursor="scroll">Watch it pack</a>
+        <table class="spec-table">
+          <tr><th>Case</th><td>41 mm · 10.2 mm · champagne gold</td></tr>
+          <tr><th>Movement</th><td>V-41 · 21,600 vph · 23 jewels</td></tr>
+          <tr><th>Dial</th><td>Black sunburst, gold sticks</td></tr>
+          <tr><th>Strap</th><td>Alligator, hand-stitched</td></tr>
+          <tr><th>Coffret</th><td>Black calf, suede well, wax V</td></tr>
+        </table>
+      </div>
+    </article>
+  </main>
+  <footer class="footer">
+    <div class="footer-brand"><p class="nav-logo">Vérault</p></div>
+    <div class="footer-map">
+      <div><a href="nocturne.html">Nocturne</a><a href="ambre.html">Ambre Noir</a><a href="sceau.html">Sceau</a></div>
+      <div><a href="salon.html">Request this piece</a></div>
+      <div><a href="index.html">Home</a></div>
+      <div><p data-clock>Genève</p></div>
+    </div>
+    <div class="footer-base"><p>© 2026 Maison Vérault.</p></div>
+  </footer>
+  <script src="js/vendor/gsap.min.js"></script>
+  <script src="js/vendor/ScrollTrigger.min.js"></script>
+  <script src="js/vendor/lenis.min.js"></script>
+  <script src="js/site.js"></script>
+</body>
+</html>

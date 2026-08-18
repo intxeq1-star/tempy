@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Collection — Maison Vérault</title>
+  <meta name="description" content="Four pieces this year. Orion, Nocturne, Ambre Noir, and Sceau. Nothing else." />
+  <meta name="theme-color" content="#080808" />
+  <link rel="icon" type="image/svg+xml" href="assets/images/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Outfit:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="js/vendor/lenis.css" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/pages.css" />
+</head>
+<body data-page="collection">
+  <div class="cursor" aria-hidden="true"><div class="cursor-dot"></div><div class="cursor-ring"></div><span class="cursor-label"></span></div>
+  <div class="progress" aria-hidden="true"><i></i></div>
+  <div class="loader" id="loader"><div class="loader-inner"><p class="loader-mark">V</p><div class="loader-line"><span></span></div><p class="loader-count" id="loaderCount">000</p><p class="loader-word">The collection</p></div></div>
+  <header class="nav" id="nav">
+    <button class="nav-btn" id="menuBtn" type="button" aria-label="Open menu" data-cursor="menu"><span></span><span></span></button>
+    <a class="nav-logo" href="index.html">Vérault</a>
+    <a class="nav-cta magnetic" href="salon.html" data-cursor="enter">Request access</a>
+  </header>
+  <div class="menu" id="menu" hidden>
+    <nav class="menu-nav">
+      <a href="maison.html" data-index="01">The House</a>
+      <a href="index.html#pack" data-index="02">The Coffret</a>
+      <a href="collection.html" data-index="03">Collection</a>
+      <a href="atelier.html" data-index="04">Atelier</a>
+      <a href="journal.html" data-index="05">Journal</a>
+      <a href="salon.html" data-index="06">Private Salon</a>
+    </nav>
+    <p class="menu-aside">Genève · Paris · By appointment</p>
+  </div>
+
+  <main>
+    <header class="page-hero">
+      <img src="assets/images/og-cover.jpg" alt="" />
+      <div class="page-hero-shade"></div>
+      <div class="page-hero-copy">
+        <p class="crumb"><a href="index.html">Home</a> · Collection</p>
+        <h1 class="display">Four pieces.<br /><em>This year only.</em></h1>
+      </div>
+    </header>
+    <section class="page-wrap">
+      <p class="lede reveal">The house does not renew a catalogue. It finishes what the bench can honestly close. If a fifth piece appears, a year has been too generous.</p>
+      <div class="collect-grid" style="margin-top:4rem">
+        <a class="collect-card" href="orion.html" data-cursor="view">
+          <img src="assets/images/watch-orion.jpg" alt="Orion 41" />
+          <h3>Orion 41</h3>
+          <p>Champagne gold. The one that falls into the coffret.</p>
+        </a>
+        <a class="collect-card" href="nocturne.html" data-cursor="view">
+          <img src="assets/images/watch-nocturne.jpg" alt="Nocturne" />
+          <h3>Nocturne</h3>
+          <p>Black ceramic. The night, left open.</p>
+        </a>
+        <a class="collect-card" href="ambre.html" data-cursor="view">
+          <img src="assets/images/parfum.jpg" alt="Ambre Noir" />
+          <h3>Ambre Noir</h3>
+          <p>A fragrance that never leaves the lamp entirely.</p>
+        </a>
+        <a class="collect-card" href="sceau.html" data-cursor="view">
+          <img src="assets/images/bijou.jpg" alt="Sceau" />
+          <h3>Sceau</h3>
+          <p>Gold, once. A stone the color of sealed wax.</p>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-brand"><p class="nav-logo">Vérault</p><p>Maison privée of time and gold.</p></div>
+    <div class="footer-map">
+      <div><p class="eyebrow">Maison</p><a href="index.html">Home</a><a href="maison.html">The House</a><a href="atelier.html">Atelier</a></div>
+      <div><p class="eyebrow">Collection</p><a href="orion.html">Orion 41</a><a href="nocturne.html">Nocturne</a><a href="ambre.html">Ambre Noir</a><a href="sceau.html">Sceau</a></div>
+      <div><p class="eyebrow">Visit</p><a href="salon.html">Private salon</a><a href="journal.html">Journal</a></div>
+      <div><p class="eyebrow">Atelier</p><p>Rue des Granges 8, Genève</p></div>
+    </div>
+    <div class="footer-base"><p>© 2026 Maison Vérault.</p><p data-clock>Genève</p></div>
+  </footer>
+  <script src="js/vendor/gsap.min.js"></script>
+  <script src="js/vendor/ScrollTrigger.min.js"></script>
+  <script src="js/vendor/lenis.min.js"></script>
+  <script src="js/site.js"></script>
+</body>
+</html>

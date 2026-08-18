@@ -879,6 +879,266 @@ textarea {
   font-size: 0.72rem;
 }
 
+.skip {
+  position: absolute;
+  left: 1rem;
+  top: -4rem;
+  z-index: 120;
+  background: var(--gold);
+  color: var(--void);
+  padding: 0.5rem 0.8rem;
+}
+
+.skip:focus {
+  top: 1rem;
+}
+
+.pack-story,
+.horology,
+.years,
+.journal-home {
+  padding: 14vh 6vw;
+  border-top: 1px solid var(--line);
+}
+
+.pack-story-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+  margin: 4rem 0 5rem;
+}
+
+.story-card span {
+  color: var(--gold);
+  letter-spacing: 0.2em;
+  font-size: 0.7rem;
+}
+
+.story-card h3 {
+  font-family: var(--serif);
+  font-size: 1.8rem;
+  font-weight: 400;
+  margin: 0.6rem 0 0.7rem;
+}
+
+.story-card p {
+  color: var(--ivory-dim);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.pack-gallery {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr 0.8fr 1fr;
+  gap: 0.8rem;
+}
+
+.pack-gallery img {
+  width: 100%;
+  height: 42vh;
+  object-fit: cover;
+}
+
+.horology .page-grid {
+  margin-top: 2rem;
+}
+
+.anatomy {
+  padding: 14vh 6vw;
+  border-top: 1px solid var(--line);
+}
+
+.anatomy-list {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 4rem;
+  margin-top: 3rem;
+}
+
+.anatomy-list li {
+  padding: 1.4rem 0;
+  border-top: 1px solid var(--line);
+}
+
+.anatomy-list h3 {
+  font-family: var(--display);
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 400;
+  margin-bottom: 0.55rem;
+}
+
+.anatomy-list p {
+  font-family: var(--serif);
+  font-size: 1.15rem;
+  color: var(--ivory-dim);
+  line-height: 1.5;
+}
+
+.principles,
+.faq {
+  padding: 14vh 6vw;
+  border-top: 1px solid var(--line);
+}
+
+.principle-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 2.2rem;
+  margin-top: 3rem;
+}
+
+.principle-grid h3 {
+  font-family: var(--serif);
+  font-size: 1.6rem;
+  font-weight: 400;
+  margin-bottom: 0.6rem;
+}
+
+.principle-grid p {
+  color: var(--ivory-dim);
+  line-height: 1.55;
+}
+
+.faq-list {
+  max-width: 48rem;
+  margin-top: 2rem;
+}
+
+.faq-list details {
+  border-top: 1px solid var(--line);
+  padding: 1.1rem 0;
+}
+
+.faq-list summary {
+  font-family: var(--serif);
+  font-size: 1.45rem;
+  cursor: pointer;
+  list-style: none;
+}
+
+.faq-list summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq-list details p {
+  margin-top: 0.7rem;
+  color: var(--ivory-dim);
+  font-family: var(--serif);
+  font-size: 1.15rem;
+}
+
+.letters {
+  padding: 14vh 6vw;
+  border-top: 1px solid var(--line);
+}
+
+.letter-archive {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2.4rem 3rem;
+  margin-top: 3rem;
+}
+
+.letter-archive p {
+  font-family: var(--serif);
+  font-size: 1.35rem;
+  font-style: italic;
+  line-height: 1.45;
+}
+
+.letter-archive cite {
+  display: block;
+  margin-top: 0.7rem;
+  font-style: normal;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+
+.calibre {
+  padding: 14vh 6vw;
+  border-top: 1px solid var(--line);
+}
+
+.glossary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 4rem;
+  margin-top: 3rem;
+}
+
+.glossary > div {
+  padding: 1.15rem 0;
+  border-top: 1px solid var(--line);
+}
+
+.glossary dt {
+  font-family: var(--display);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  color: var(--gold);
+  margin-bottom: 0.4rem;
+}
+
+.glossary dd {
+  font-family: var(--serif);
+  font-size: 1.12rem;
+  color: var(--ivory-dim);
+}
+
+.crest {
+  padding: 12vh 6vw;
+  display: grid;
+  justify-items: center;
+  gap: 1.4rem;
+  border-top: 1px solid var(--line);
+}
+
+.crest-svg {
+  width: min(220px, 50vw);
+  height: auto;
+}
+
+.colophon {
+  padding: 12vh 6vw 8vh;
+  border-top: 1px solid var(--line);
+}
+
+.site-index {
+  list-style: none;
+}
+
+.site-index li {
+  border-top: 1px solid var(--line);
+  padding: 0.65rem 0;
+}
+
+.site-index a {
+  color: var(--ivory-dim);
+  font-size: 0.92rem;
+}
+
+.site-index a:hover {
+  color: var(--gold-soft);
+}
+
+@media (max-width: 900px) {
+  .pack-story-grid,
+  .pack-gallery,
+  .anatomy-list,
+  .principle-grid,
+  .glossary,
+  .letter-archive {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
 /* Motion helpers */
 .reveal,
 .fade-up {
