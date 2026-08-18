@@ -1,58 +1,46 @@
 # Maison Vérault
 
-An invitation-only luxury maison website — the kind of exclusive, cinematic house site you see from haute horlogerie and quiet-luxury houses today.
+A full luxury **website** — not a single page. An invitation-only maison of time, with a home film and a 3D watch that **falls, then packs itself into a coffret** as you scroll.
 
-Scroll, and a full-screen film plays. That is the point.
+**Vérault** is fictional. The rooms are real files.
 
-**Vérault** is fictional. The craft is not.
+## The coffret
 
-## What you get
+Scroll the home past the manifesto. Orion drops through the dark, hovers, the lid opens, the watch nests in suede, the lid closes, ribbon and wax seal themselves. Your scroll is the playhead.
 
-- Cinematic preloader with a counted entrance
-- Full-bleed hero, gold-on-void, living still
-- **Scroll-driven film** — Apple-style scrollytelling. The frame is pinned; your scroll is the playhead
-- Custom gold cursor, magnetic buttons, split-title reveal
-- Editorial collection, atelier story, private salon letter
-- Smooth scroll (Lenis) and timeline motion (GSAP + ScrollTrigger)
-- Under 5 MB. Well under the 120 MB ceiling
+Then a second cinematic film continues the house story.
 
-## The film
+## Rooms of the site
 
-Luxury product pages (Apple, Patek-adjacent houses, Awwwards maisons) rarely “play a video” in the ordinary sense. They bind a sequence of cinematic frames to scroll position.
+| Page | What it is |
+| --- | --- |
+| `index.html` | Home — 1000 lines. Hero, fall-and-pack, film, collection, journal, salon |
+| `maison.html` | The house, 1891–2026 |
+| `collection.html` | Four pieces |
+| `orion.html` | Orion 41 |
+| `nocturne.html` | Nocturne |
+| `ambre.html` | Ambre Noir |
+| `sceau.html` | Sceau |
+| `atelier.html` | The bench |
+| `journal.html` | Notes from the lamp |
+| `salon.html` | Private letter |
 
-Vérault does the same:
-
-1. Seven campaign stills are preloaded
-2. A sticky canvas fills the viewport for several screens of scroll
-3. Progress crossfades and Ken-Burns the next frame
-4. Chapter titles — *Soie*, *L’Atelier*, *Orion* — change with the reel
-
-It feels like a private film because it is timed to your hand.
+Styles live in `css/`. Motion lives in `js/`. This is a website: HTML + CSS + JavaScript, many pages, no build step.
 
 ## Run it
-
-Open `index.html` locally, or from the repo root:
 
 ```bash
 python3 -m http.server 8080
 ```
 
-Then visit `http://localhost:8080`.
+Open `http://localhost:8080`.
 
 ## Stack
 
-Vanilla HTML, CSS, and JavaScript. No build step.
+Vanilla pages. [GSAP](https://gsap.com/) + ScrollTrigger. [Lenis](https://github.com/darkroomengineering/lenis). Cinzel, Cormorant Garamond, Outfit.
 
-| Piece | Why |
-| --- | --- |
-| [GSAP](https://gsap.com/) + ScrollTrigger | Precise scroll timelines |
-| [Lenis](https://github.com/darkroomengineering/lenis) | Inertial smooth scroll |
-| Cinzel, Cormorant Garamond, Outfit | Display / editorial / UI |
-
-## Design notes
-
-Researched against current luxury-web practice: dark charcoal rather than flat black, antique gold, oversized serif headlines, almost no chrome, grain, letterbox, and motion that is slow on purpose. Quiet luxury, not a nightclub.
+About **5 MB**. Well under 120 MB.
 
 ## License
 
-Site code is yours to study and reuse. Imagery is original campaign stills created for this maison. Vérault is a fictional house.
+Study and reuse the code. Imagery was made for this maison.
