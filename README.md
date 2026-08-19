@@ -1,46 +1,62 @@
-# Maison Vérault
+# Prefect
 
-A full luxury **website** — not a single page. An invitation-only maison of time, with a home film and a 3D watch that **falls, then packs itself into a coffret** as you scroll.
+One desk for a school of **ninety Windows laptops**.
 
-**Vérault** is fictional. The rooms are real files.
+You sit here. They sit in Lab A, Lab B, two trolleys, and the office. You point at one machine, or a room, or the whole hall — and you write an order. PowerShell runs. A file goes down the corridor. PowerPoint stays in the locker until a student knocks and you turn the key.
 
-## The coffret
+**Vérault is gone.** This hall is the work.
 
-Scroll the home past the manifesto. Orion drops through the dark, hovers, the lid opens, the watch nests in suede, the lid closes, ribbon and wax seal themselves. Your scroll is the playhead.
+## What it does today
 
-Then a second cinematic film continues the house story.
+1. **The desk.** Remote PowerShell on every laptop at once, or on the one that needs it. A shelf of safe school scripts (who is signed in, disk, battery, startup, inventory). Push a file from the cupboard and, if you wish, run it. Hold screens. Speak to the room. Exam mode. Restart. Every order is written in the book.
 
-## Rooms of the site
+2. **The locker.** Paint, PowerPoint, games, Store, Discord, camera — shut by default. Word, Excel, Teams, OneNote, Notepad stay open: they are the lesson. A student can knock. You open the app for a quarter hour, a period, or one machine.
 
-| Page | What it is |
-| --- | --- |
-| `index.html` | Home — 1000 lines. Hero, fall-and-pack, film, collection, journal, salon |
-| `maison.html` | The house, 1891–2026 |
-| `collection.html` | Four pieces |
-| `orion.html` | Orion 41 |
-| `nocturne.html` | Nocturne |
-| `ambre.html` | Ambre Noir |
-| `sceau.html` | Sceau |
-| `atelier.html` | The bench |
-| `journal.html` | Notes from the lamp |
-| `salon.html` | Private letter |
+3. **The web gate — held.** You asked to keep site blocking aside. DNS alone will not hold Chrome, and incognito walks around a hosts file. When we pick it up: Chrome enterprise policy (incognito shut, your block list) with school DNS underneath.
 
-Styles live in `css/`. Motion lives in `js/`. This is a website: HTML + CSS + JavaScript, many pages, no build step.
-
-## Run it
+## Open the desk
 
 ```bash
-python3 -m http.server 8080
+./run.sh
 ```
 
-Open `http://localhost:8080`.
+That makes a local virtualenv if needed and opens the desk on port 8080. Sign in as **`head`** / **`campus90`**.
+
+The ninety machines on the roll are a living campus so you can learn the desk today. Three start dark. Students knock. Orders complete in the console as if the trolley answered.
+
+## A real laptop
+
+On a school Windows PC, as Administrator:
+
+```powershell
+$env:PREFECT_SERVER = "https://your-desk"
+irm https://your-desk/agent/Install-PrefectAgent.ps1 | iex
+```
+
+Or copy `agent/Install-PrefectAgent.ps1` and `agent/PrefectAgent.ps1` and run:
+
+```powershell
+.\Install-PrefectAgent.ps1 -Server https://your-desk -RoomId lab-a
+```
+
+The task is named **PrefectAgent**, runs as SYSTEM at startup, and writes to `C:\ProgramData\Prefect`. A student may be told the machine is managed. That is the point. To take it off: `Uninstall-PrefectAgent.ps1`.
+
+The agent will not format a disk. The desk refuses wipe-class commands.
+
+## Rooms on the seed roll
+
+| Room | Machines |
+| --- | --- |
+| Computer Lab A | LAB-A-01 … 24 |
+| Computer Lab B | LAB-B-01 … 24 |
+| Trolley 1 — English | CART-1-01 … 18 |
+| Trolley 2 — Science | CART-2-01 … 18 |
+| Staff | STAFF-01 … 06 |
 
 ## Stack
 
-Vanilla pages. [GSAP](https://gsap.com/) + ScrollTrigger. [Lenis](https://github.com/darkroomengineering/lenis). Cinzel, Cormorant Garamond, Outfit.
-
-About **5 MB**. Well under 120 MB.
+Python 3, FastAPI, SQLite in `data/prefect.db`. The desk is one HTML page, no build step.
 
 ## License
 
-Study and reuse the code. Imagery was made for this maison.
+Study and reuse the code. Use it only on machines your school owns.

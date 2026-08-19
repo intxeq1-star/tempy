@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Prefect — the desk</title>
+  <meta name="description" content="One desk for ninety school laptops. Commands, locks, permission." />
+  <link rel="icon" href="/img/mark.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,420;0,9..144,560;0,9..144,680;1,9..144,480&family=IBM+Plex+Mono:wght@400;500&family=Source+Sans+3:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/app.css" />
+</head>
+<body>
+  <div id="login" class="login">
+    <div class="login-veil"></div>
+    <div class="login-col">
+      <div class="brand-lock">
+        <img src="/img/mark.svg" alt="" width="42" height="42" />
+        <div>
+          <p class="eyebrow">Campus command</p>
+          <h1>Prefect</h1>
+        </div>
+      </div>
+      <p class="login-lede">Ninety machines. One quiet desk. You write the order — they all sit up, or just the one that needs it.</p>
+      <form id="login-form" class="login-card" autocomplete="on">
+        <label>Desk
+          <input id="user" name="username" value="head" autocomplete="username" />
+        </label>
+        <label>Key
+          <input id="pass" name="password" type="password" value="campus90" autocomplete="current-password" />
+        </label>
+        <button type="submit" class="btn brass">Open the hall</button>
+        <p class="hint">Demo desk <code>head</code> · key <code>campus90</code></p>
+        <p id="login-err" class="err" hidden></p>
+      </form>
+      <ol class="login-points">
+        <li><b>The roll.</b> All ninety, by room or by name.</li>
+        <li><b>The order.</b> PowerShell on one laptop, or the whole trolley.</li>
+        <li><b>The locker.</b> PowerPoint, Paint, games — shut until you turn the key.</li>
+      </ol>
+    </div>
+    <aside class="login-aside">
+      <p class="aside-kicker">Held for a later hour</p>
+      <h2>The web gate</h2>
+      <p>Chrome, including incognito, will answer to you next. DNS and policy together, so a private window is not a back door. Today the locker and the desk come first.</p>
+    </aside>
+  </div>
+
+  <div id="app" class="shell" hidden>
+    <aside class="rail">
+      <div class="rail-brand">
+        <img src="/img/mark.svg" alt="" width="28" height="28" />
+        <div>
+          <strong>Prefect</strong>
+          <span>the desk</span>
+        </div>
+      </div>
+      <nav id="nav"></nav>
+      <div class="rail-foot">
+        <div id="who" class="who"></div>
+        <button type="button" id="signout" class="textish">Lock the desk</button>
+      </div>
+    </aside>
+    <div class="stage">
+      <header class="top">
+        <div>
+          <p class="crumb" id="crumb">Board</p>
+          <h2 id="headline">The hall</h2>
+        </div>
+        <div class="top-actions">
+          <div class="search">
+            <input id="q" placeholder="Find a machine or a student" />
+          </div>
+          <button type="button" id="sel-online" class="btn ghost">Select the live ones</button>
+        </div>
+      </header>
+      <main id="main" class="main"></main>
+    </div>
+    <div id="dock" class="dock" hidden></div>
+    <aside id="drawer" class="drawer" hidden></aside>
+  </div>
+
+  <div id="toast" class="toasts" aria-live="polite"></div>
+  <script src="/js/api.js"></script>
+  <script src="/js/app.js"></script>
+</body>
+</html>

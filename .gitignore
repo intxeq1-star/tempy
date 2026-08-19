@@ -1,6 +1,9 @@
+data/
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+*.db
 .DS_Store
-node_modules/
-.idea/
-.vscode/
-*.log
-.cache/
