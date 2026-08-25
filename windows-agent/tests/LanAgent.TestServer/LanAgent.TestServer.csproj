@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <Description>Reference Server.exe simulator implementing the server side of PROTOCOL_CONTRACT.md — used to test the agent end-to-end. Deliberately has NO reference to LanAgent.Core: it is implemented from the contract alone.</Description>
+  </PropertyGroup>
+</Project>

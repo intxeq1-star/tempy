@@ -4,3 +4,10 @@ node_modules/
 .vscode/
 *.log
 .cache/
+
+# .NET build artifacts
+**/bin/
+**/obj/
+windows-agent/publish/
+windows-agent/tests/**/TestResults/
+*.user
