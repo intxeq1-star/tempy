@@ -4,3 +4,15 @@ node_modules/
 .vscode/
 *.log
 .cache/
+
+# Tempy Server runtime and secrets
+data/
+artifacts/
+*.db
+*.db-shm
+*.db-wal
+appsettings.Production.json
+*.pfx
+*.p12
+*.snupkg
+TestResults/

@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Tempy | LAN Management Authority</title>
+  <link rel="stylesheet" href="/assets/app.css">
+</head>
+<body>
+  <div class="ambient ambient-a"></div><div class="ambient ambient-b"></div>
+  <main id="login-view" class="auth-shell">
+    <section class="login-card" aria-labelledby="login-title">
+      <div class="brand-mark">T</div>
+      <p class="eyebrow">CENTRAL AUTHORITY</p>
+      <h1 id="login-title">Tempy Server</h1>
+      <p class="subtle">Sign in to manage authorized Windows devices on this LAN.</p>
+      <form id="login-form" novalidate>
+        <label>Administrator username<input id="login-username" autocomplete="username" required maxlength="128"></label>
+        <label>Password<input id="login-password" type="password" autocomplete="current-password" required></label>
+        <button class="primary full" type="submit">Secure sign in</button>
+      </form>
+      <p id="login-error" class="form-error" role="alert"></p>
+      <p class="security-note">This console uses an authenticated session and CSRF-protected API requests. Agent operations are separately authenticated.</p>
+    </section>
+  </main>
+
+  <div id="app-view" class="app-shell hidden">
+    <aside class="sidebar">
+      <div class="sidebar-brand"><div class="brand-mark small">T</div><span>tempy<span class="accent">.</span></span></div>
+      <div class="server-indicator"><span class="live-dot"></span><span id="server-endpoint">LAN server</span></div>
+      <nav aria-label="Primary navigation">
+        <button class="nav-link active" data-panel="dashboard-panel"><span>▦</span> Dashboard</button>
+        <button class="nav-link" data-panel="groups-panel"><span>⊞</span> Device groups</button>
+        <button class="nav-link" data-panel="operations-panel"><span>↗</span> Operations</button>
+        <button class="nav-link" data-panel="policy-panel"><span>◈</span> Policies</button>
+        <button class="nav-link" data-panel="apps-panel"><span>□</span> Applications</button>
+        <button class="nav-link admin-only" data-panel="audit-panel"><span>◷</span> Audit trail</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="identity"><span class="avatar" id="user-initial">A</span><div><strong id="current-user">—</strong><small id="current-role">—</small></div></div>
+        <button id="logout-button" class="quiet">Sign out</button>
+      </div>
+    </aside>
+
+    <section class="workspace">
+      <header class="topbar">
+        <div><p class="eyebrow" id="panel-kicker">FLEET OVERVIEW</p><h2 id="panel-title">Live device dashboard</h2></div>
+        <div class="top-actions"><span id="event-status" class="connection-status"><i></i> Live updates connected</span><button id="refresh-button" class="secondary">Refresh</button></div>
+      </header>
+
+      <div id="toast-region" class="toast-region" aria-live="polite"></div>
+
+      <section id="dashboard-panel" class="panel active">
+        <div class="stat-grid">
+          <article class="stat-card"><span>Total managed</span><strong id="total-count">0</strong><small>durable device records</small></article>
+          <article class="stat-card online"><span>Online</span><strong id="online-count">0</strong><small>valid heartbeat in timeout</small></article>
+          <article class="stat-card offline"><span>Offline</span><strong id="offline-count">0</strong><small>jobs remain durable</small></article>
+          <article class="stat-card syncing"><span>Synchronizing</span><strong id="syncing-count">0</strong><small>desired policy version <span id="desired-policy-version">—</span></small></article>
+          <article class="stat-card failed"><span>Failed state</span><strong id="failed-count">0</strong><small>requires review</small></article>
+        </div>
+
+        <div class="two-column command-layout">
+          <section class="card command-card">
+            <div class="card-heading"><div><p class="eyebrow">DURABLE COMMAND QUEUE</p><h3>Queue a management command</h3></div><span class="security-chip">AUDITED</span></div>
+            <form id="command-form" class="command-form">
+              <div class="target-callout"><span>Target</span><strong id="target-preview">Choose a target</strong><small>One device, selected devices, group, or every device. Every target gets its own job.</small></div>
+              <div class="form-grid">
+                <label>Target mode<select id="target-kind"><option value="DEVICE">One PC</option><option value="DEVICES">Selected PCs</option><option value="GROUP">Device group</option><option value="ALL">All PCs</option></select></label>
+                <label>Command type<select id="command-type"></select></label>
+              </div>
+              <div id="one-device-picker" class="target-picker"><label>Device<select id="one-device"></select></label></div>
+              <div id="multiple-device-picker" class="target-picker hidden"><label>Selected devices <span class="field-note">Choose one or more</span></label><div id="device-checklist" class="device-checklist"></div></div>
+              <div id="group-picker" class="target-picker hidden"><label>Group<select id="target-group"></select></label></div>
+              <div id="terminal-command-wrap" class="target-picker hidden"><label>Administrator terminal command <span class="field-note">Runs only on the explicitly selected target(s), with durable per-device results.</span><input id="terminal-command" maxlength="8192" placeholder="hostname"></label></div>
+              <label>Payload <span class="field-note">JSON object. Use this for command-specific options; terminal text is inserted as payload.command.</span><textarea id="command-payload" rows="4" spellcheck="false">{}</textarea></label>
+              <label>Operation label <span class="field-note">Optional</span><input id="command-label" maxlength="256" placeholder="e.g. Verify hostname across Lab 1"></label>
+              <button class="primary" type="submit">Create durable jobs</button>
+              <p class="form-error" id="command-error" role="alert"></p>
+            </form>
+          </section>
+          <section class="card reliability-card">
+            <p class="eyebrow">DELIVERY GUARANTEE</p><h3>Database first. Connection second.</h3>
+            <ol><li>Administrator action is committed to SQLite.</li><li>A device-specific command is created for each target.</li><li>Online agents acknowledge and report results.</li><li>Offline jobs stay <b>PENDING</b> until reconnect.</li></ol>
+            <div class="mini-rule"></div>
+            <p class="subtle">A green delivery indicator never means success. Only an agent’s <code>COMMAND_RESULT</code> marked <b>SUCCESS</b> does.</p>
+          </section>
+        </div>
+
+        <section class="card fleet-card">
+          <div class="card-heading fleet-head"><div><p class="eyebrow">LIVE PRESENCE</p><h3>Managed devices</h3></div><div class="table-tools"><input id="device-search" placeholder="Search device, host, IP…" aria-label="Search devices"><span id="device-filter-count" class="muted">0 shown</span></div></div>
+          <div class="table-wrap"><table><thead><tr><th>Device</th><th>Presence</th><th>IP address</th><th>Last heartbeat</th><th>Agent</th><th>Policy</th><th>Sync</th><th>Commands</th><th>DNS</th></tr></thead><tbody id="device-table"></tbody></table></div>
+        </section>
+      </section>
+
+      <section id="groups-panel" class="panel">
+        <div class="two-column apps-layout">
+          <section class="card"><div class="card-heading"><div><p class="eyebrow">TARGET ORGANIZATION</p><h3>Create a device group</h3></div></div>
+            <form id="group-form"><label>Group name<input id="group-name" maxlength="128" required placeholder="e.g. CLASSROOM-1"></label><label>Description <input id="group-description" maxlength="512" placeholder="Optional location or purpose"></label><label>Members <span class="field-note">A command to a group still creates one job per device.</span></label><div id="group-device-checklist" class="device-checklist"></div><button class="primary" type="submit">Create group</button><p id="group-error" class="form-error"></p></form>
+          </section>
+          <section class="card"><p class="eyebrow">CURRENT GROUPS</p><h3>Command-ready groups</h3><div id="group-list" class="application-list"></div><p class="subtle">Use the group target mode in the durable command queue or application deployment form to operate on a group.</p></section>
+        </div>
+      </section>
+
+      <section id="operations-panel" class="panel">
+        <div class="section-heading"><div><p class="eyebrow">PER-DEVICE OUTCOMES</p><h3>Command operations</h3></div><button id="operations-refresh" class="secondary">Refresh operations</button></div>
+        <div id="operations-list" class="operations-list"></div>
+      </section>
+
+      <section id="policy-panel" class="panel">
+        <div class="two-column policy-layout">
+          <section class="card policy-card"><div class="card-heading"><div><p class="eyebrow">DESIRED STATE</p><h3>Network & browser policy</h3></div><span id="policy-version-badge" class="version-badge">v—</span></div>
+            <form id="policy-form">
+              <div class="policy-row"><div><strong>AdGuard DNS</strong><small>Central DNS value delivered to selected interfaces by the Agent.</small></div><label class="toggle"><input id="dns-enabled" type="checkbox"><span></span></label></div>
+              <label>DNS server<input id="dns-server" value="192.168.1.100" inputmode="decimal"></label>
+              <div class="policy-row"><div><strong>Chrome Incognito</strong><small id="chrome-policy-state">Disabled by desired policy</small></div><label class="toggle"><input id="chrome-incognito" type="checkbox"><span></span></label></div>
+              <div class="policy-row"><div><strong>Edge InPrivate</strong><small id="edge-policy-state">Disabled by desired policy</small></div><label class="toggle"><input id="edge-inprivate" type="checkbox"><span></span></label></div>
+              <label>Change reason <input id="policy-reason" maxlength="256" placeholder="e.g. Reinforce classroom browser policy"></label>
+              <div class="button-row"><button class="primary" type="submit">Save desired policy</button><button id="sync-all-button" class="danger-soft" type="button">SYNC ALL</button></div>
+              <p id="policy-error" class="form-error"></p>
+            </form>
+          </section>
+          <section class="card sync-card"><p class="eyebrow">AUTOMATIC RECONCILIATION</p><h3>Policy synchronization</h3><div id="sync-overview" class="sync-overview"></div><p class="subtle">Saving a policy and SYNC ALL each create a durable policy version. Online devices receive a <code>SYNC_REQUEST</code>; offline devices retain their assignment and synchronize automatically when registered again.</p><div class="mini-rule"></div><p class="subtle">Actual agent state must match DNS, Chrome and Edge values before a device is marked <b>SYNCED</b>.</p></section>
+        </div>
+      </section>
+
+      <section id="apps-panel" class="panel">
+        <div class="two-column apps-layout">
+          <section class="card"><div class="card-heading"><div><p class="eyebrow">WINGET CATALOG</p><h3>Application management</h3></div></div>
+            <form id="application-form" class="form-grid compact"><label>Package ID<input id="app-package" required maxlength="256" placeholder="Microsoft.VisualStudioCode"></label><label>Display name<input id="app-name" required maxlength="256" placeholder="Visual Studio Code"></label><label>Source<input id="app-source" value="winget" maxlength="64"></label><label>Desired version <input id="app-version" maxlength="128" placeholder="Optional"></label><button class="secondary" type="submit">Add to catalog</button></form><p id="app-error" class="form-error"></p>
+            <div id="application-list" class="application-list"></div>
+          </section>
+          <section class="card"><p class="eyebrow">DEPLOYMENT</p><h3>Deploy catalog application</h3>
+            <form id="deploy-form"><label>Application<select id="deploy-app"></select></label><label>Action<select id="deploy-action"><option value="INSTALL">INSTALL</option><option value="UNINSTALL">UNINSTALL</option><option value="UPDATE">UPDATE</option><option value="CHECK">CHECK</option></select></label><label>Target<select id="deploy-target-kind"><option value="ALL">All PCs</option><option value="GROUP">Device group</option><option value="DEVICE">One PC</option></select></label><div id="deploy-device-wrap" class="hidden"><label>Device<select id="deploy-device"></select></label></div><div id="deploy-group-wrap" class="hidden"><label>Group<select id="deploy-group"></select></label></div><button class="primary" type="submit">Create deployment jobs</button><p id="deploy-error" class="form-error"></p></form><p class="subtle">An application deployment creates one durable command per target device; its per-device status appears in Operations.</p>
+          </section>
+        </div>
+      </section>
+
+      <section id="audit-panel" class="panel"><div class="section-heading"><div><p class="eyebrow">IMMUTABLE HISTORY</p><h3>Administrator audit trail</h3></div><button id="audit-refresh" class="secondary">Refresh audit</button></div><section class="card"><div class="table-wrap"><table><thead><tr><th>Time (UTC)</th><th>Administrator</th><th>Action</th><th>Entity</th><th>Outcome</th><th>Origin</th></tr></thead><tbody id="audit-table"></tbody></table></div></section></section>
+    </section>
+  </div>
+
+  <dialog id="device-dialog" class="detail-dialog"><button id="close-device-dialog" class="dialog-close" aria-label="Close">×</button><div id="device-detail-content"></div></dialog>
+  <dialog id="operation-dialog" class="detail-dialog wide"><button id="close-operation-dialog" class="dialog-close" aria-label="Close">×</button><div id="operation-detail-content"></div></dialog>
+  <script src="/assets/app.js" defer></script>
+</body>
+</html>
