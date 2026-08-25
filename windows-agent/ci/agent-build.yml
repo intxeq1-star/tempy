@@ -4,6 +4,11 @@ name: Build LanAgent Windows exe
 # local toolchain: unit tests run, then single-file self-contained
 # LanAgent.Service.exe + LanAgent.TestServer.exe are published and attached as
 # downloadable artifacts (and as a GitHub Release when a v* tag is pushed).
+#
+# ENABLE ONCE: copy this file to  .github/workflows/agent-build.yml  and commit
+# (from an account with workflow permission — e.g. your own GitHub login or the
+# web UI editor). This copy lives outside .github/ so automation tokens without
+# `workflows` permission can still push the source.
 
 on:
   push:

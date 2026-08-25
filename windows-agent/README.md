@@ -67,8 +67,10 @@ windows-agent/
 The executable is produced by compiling this project — it is not (and cannot be) generated inside
 a text-only environment. Three ways to get the finished binary:
 
-1. **Zero-install (cloud build):** push this branch to GitHub. The workflow
-   `.github/workflows/agent-build.yml` runs the unit tests and builds **single-file,
+1. **Zero-install (cloud build):** enable the included workflow once — copy
+   `windows-agent/ci/agent-build.yml` to `.github/workflows/agent-build.yml` and commit it
+   (do this from your own GitHub account / the web UI; automation tokens often lack workflow
+   permission). After that, every push runs the unit tests and builds **single-file,
    self-contained** `LanAgent.Service.exe` + `LanAgent.TestServer.exe` on a GitHub Windows runner —
    download them from the run's *Artifacts* section. Pushing a tag `agent-v1.0.0` attaches the exe
    to a GitHub Release.
