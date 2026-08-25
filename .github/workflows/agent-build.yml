@@ -1,0 +1,88 @@
+name: Build LanAgent Windows exe
+
+# Builds the total working .exe in the cloud (GitHub runners) so nobody needs a
+# local toolchain: unit tests run, then single-file self-contained
+# LanAgent.Service.exe + LanAgent.TestServer.exe are published and attached as
+# downloadable artifacts (and as a GitHub Release when a v* tag is pushed).
+
+on:
+  push:
+    branches: ['**']
+    paths: ['windows-agent/**', '.github/workflows/agent-build.yml']
+  pull_request:
+    paths: ['windows-agent/**', '.github/workflows/agent-build.yml']
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Unit tests
+        run: dotnet test windows-agent/tests/LanAgent.Core.Tests -c Release
+
+      - name: Publish LanAgent.Service.exe (single-file, self-contained)
+        run: >
+          dotnet publish windows-agent/src/LanAgent.Service -c Release -r win-x64
+          --self-contained true
+          -p:PublishSingleFile=true
+          -p:IncludeNativeLibrariesForSelfExtract=true
+          -p:EnableCompressionInSingleFile=true
+          -p:DebugType=none
+          -o release/LanAgent
+
+      - name: Publish LanAgent.TestServer.exe (single-file, self-contained)
+        run: >
+          dotnet publish windows-agent/tests/LanAgent.TestServer -c Release -r win-x64
+          --self-contained true
+          -p:PublishSingleFile=true
+          -p:EnableCompressionInSingleFile=true
+          -p:DebugType=none
+          -o release/TestServer
+
+      - name: Package
+        shell: pwsh
+        run: |
+          Copy-Item windows-agent/installer release/installer -Recurse
+          Compress-Archive -Path release/LanAgent, release/TestServer, release/installer `
+            -DestinationPath release/lanagent-1.0.0-win64.zip -Force
+
+      - name: Upload artifact (download the exe from the run page)
+        uses: actions/upload-artifact@v4
+        with:
+          name: lanagent-1.0.0-win64
+          path: release/
+          if-no-files-found: error
+
+  release:
+    # Push a tag like `agent-v1.0.0` to publish a GitHub Release with the zip.
+    if: startsWith(github.ref, 'refs/tags/agent-v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Publish (linux runner cross-builds fine for these projects)
+        run: >
+          dotnet publish windows-agent/src/LanAgent.Service -c Release -r win-x64
+          --self-contained true
+          -p:PublishSingleFile=true
+          -p:IncludeNativeLibrariesForSelfExtract=true
+          -p:EnableCompressionInSingleFile=true
+          -p:DebugType=none
+          -o release/LanAgent
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/LanAgent/LanAgent.Service.exe
+          generate_release_notes: true

@@ -62,6 +62,38 @@ windows-agent/
     └── LanAgent.TestServer/      ← reference Server.exe simulator + end-to-end scenarios
 ```
 
+## Getting the working .exe
+
+The executable is produced by compiling this project — it is not (and cannot be) generated inside
+a text-only environment. Three ways to get the finished binary:
+
+1. **Zero-install (cloud build):** push this branch to GitHub. The workflow
+   `.github/workflows/agent-build.yml` runs the unit tests and builds **single-file,
+   self-contained** `LanAgent.Service.exe` + `LanAgent.TestServer.exe` on a GitHub Windows runner —
+   download them from the run's *Artifacts* section. Pushing a tag `agent-v1.0.0` attaches the exe
+   to a GitHub Release.
+2. **One command, any Windows PC with the .NET 8 SDK** (`winget install Microsoft.DotNet.SDK.8`):
+   ```powershell
+   cd windows-agent
+   .\build-release.ps1          # tests + publish + zip  →  release\LanAgent\LanAgent.Service.exe
+   ```
+3. **Manual publish:**
+   ```powershell
+   dotnet publish src/LanAgent.Service -c Release -r win-x64 --self-contained true ^
+     -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true ^
+     -p:EnableCompressionInSingleFile=true -o release\LanAgent
+   ```
+
+The output is one self-contained `LanAgent.Service.exe` (~40 MB) — the 89 managed PCs need **no
+.NET runtime installed**. Deploy it with the installer:
+
+```powershell
+.\installer\install-agent.ps1 -EnrollmentKey "<secret issued by the server>" -SourceDir .\LanAgent
+```
+
+The test harness exe (`LanAgent.TestServer.exe`) runs on your admin PC / any PC:
+`LanAgent.TestServer.exe --port=8765 --localhost` (see "Running the end-to-end test harness").
+
 ## Building
 
 Requires the **.NET 8 SDK** (Windows for deployment; unit tests build/run on any OS).
