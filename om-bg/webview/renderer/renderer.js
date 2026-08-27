@@ -144,30 +144,154 @@ if (hasWebview) {
 }
 
 function makeApi() {
-  if (hasWebview) {
+  // Live HTTP backend check (when running inside OMClient.exe on http://127.0.0.1:49211)
+  if (typeof window !== 'undefined' && window.location && window.location.protocol && window.location.protocol.startsWith('http')) {
     return {
-      status: () => bridge('status'),
-      install: () => bridge('install'),
-      start: () => bridge('start'),
-      stop: () => bridge('stop'),
-      uninstall: () => bridge('uninstall'),
-      runCommand: (cmd, shell, asUser) => bridge('run-command', { cmd, shell, asUser }),
-      log: () => bridge('log'),
-      scriptPath: () => bridge('script-path'),
-      openFolder: () => bridge('open-folder'),
-      openLog: () => bridge('open-log'),
-      pathInfo: () => bridge('path-info'),
-      // App Control
-      appControlGet: () => bridge('appcontrol-get'),
-      appControlCheckPass: (password) => bridge('appcontrol-check-pass', { password }),
-      appControlAddRule: (data) => bridge('appcontrol-add-rule', data),
-      appControlToggleRule: (data) => bridge('appcontrol-toggle-rule', data),
-      appControlDeleteRule: (data) => bridge('appcontrol-delete-rule', data),
-      appControlTestStart: (data) => bridge('appcontrol-test-start', data),
-      appControlTestLaunch: (data) => bridge('appcontrol-test-launch', data),
-      appControlTestEnd: (data) => bridge('appcontrol-test-end', data)
+      status: async () => {
+        try {
+          const res = await fetch('/api/status');
+          if (res.ok) return await res.json();
+        } catch {}
+        return MOCK.status();
+      },
+      install: async () => {
+        try {
+          const res = await fetch('/api/install', { method: 'POST' });
+          if (res.ok) return await res.json();
+        } catch {}
+        return MOCK.install();
+      },
+      start: async () => {
+        try {
+          const res = await fetch('/api/start', { method: 'POST' });
+          if (res.ok) return await res.json();
+        } catch {}
+        return MOCK.start();
+      },
+      stop: async () => {
+        try {
+          const res = await fetch('/api/stop', { method: 'POST' });
+          if (res.ok) return await res.json();
+        } catch {}
+        return MOCK.stop();
+      },
+      uninstall: async () => {
+        try {
+          const res = await fetch('/api/uninstall', { method: 'POST' });
+          if (res.ok) return await res.json();
+        } catch {}
+        return MOCK.uninstall();
+      },
+      runCommand: async (cmd, shell, asUser) => {
+        try {
+          const res = await fetch('/api/run', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ cmd, shell, asUser })
+          });
+          if (res.ok) return await res.json();
+        } catch {}
+        return MOCK.runCommand(cmd, shell, asUser);
+      },
+      log: async () => {
+        try {
+          const res = await fetch('/api/log');
+          if (res.ok) return await res.text();
+        } catch {}
+        return MOCK.log();
+      },
+      scriptPath: async () => 'C:\ProgramData\OMAgent\worker.ps1',
+      openFolder: async () => '', openLog: async () => '',
+      pathInfo: async () => ({ dataDir: 'C:\ProgramData\OMAgent', script: 'worker.ps1', log: 'Logs', appControl: 'appcontrol.json' }),
+
+      appControlGet: async () => {
+        try {
+          const res = await fetch('/api/appcontrol');
+          if (res.ok) return await res.json();
+        } catch {}
+        return MOCK.appControlGet();
+      },
+      appControlCheckPass: async (password) => {
+        try {
+          const res = await fetch('/api/appcontrol/unlock', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ password })
+          });
+          if (res.ok) return await res.json();
+        } catch {}
+        return MOCK.appControlCheckPass(password);
+      },
+      appControlAddRule: async (data) => {
+        try {
+          const res = await fetch('/api/appcontrol/block', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          if (res.ok) return await res.json();
+        } catch {}
+        return MOCK.appControlAddRule(data);
+      },
+      appControlToggleRule: async (data) => {
+        try {
+          const res = await fetch('/api/appcontrol/toggle', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          if (res.ok) return await res.json();
+        } catch {}
+        return MOCK.appControlToggleRule(data);
+      },
+      appControlDeleteRule: async (data) => {
+        try {
+          const res = await fetch('/api/appcontrol/unblock', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          if (res.ok) return await res.json();
+        } catch {}
+        return MOCK.appControlDeleteRule(data);
+      },
+      appControlTestStart: async (data) => {
+        try {
+          const res = await fetch('/api/appcontrol/test/start', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          if (res.ok) return await res.json();
+        } catch {}
+        return MOCK.appControlTestStart(data);
+      },
+      appControlTestLaunch: async (data) => {
+        try {
+          const res = await fetch('/api/appcontrol/test/launch', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          if (res.ok) return await res.json();
+        } catch {}
+        return MOCK.appControlTestLaunch(data);
+      },
+      appControlTestEnd: async (data) => {
+        try {
+          const res = await fetch('/api/appcontrol/test/end', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+          if (res.ok) return await res.json();
+        } catch {}
+        return MOCK.appControlTestEnd(data);
+      }
     };
   }
+
+  // Fallback to MOCK when opened as static file:// in browser preview
   return MOCK;
 }
 
