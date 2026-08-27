@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OM Client — Control Center</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">OM</div>
+      <div class="brandtext"><h1>OM Client</h1><span>Control Center</span></div>
+    </div>
+    <nav>
+      <button class="nav-item active" data-tab="status"><span class="ic">&#9679;</span> Dashboard</button>
+      <button class="nav-item" data-tab="appcontrol"><span class="ic">&#128737;</span> App Control</button>
+      <button class="nav-item" data-tab="commands"><span class="ic">&#187;</span> Commands</button>
+      <button class="nav-item" data-tab="log"><span class="ic">&#188;</span> Logs</button>
+      <button class="nav-item" data-tab="about"><span class="ic">&#9432;</span> About</button>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="svc-pill" id="svcPill">…</div>
+    </div>
+  </aside>
+
+  <main class="content">
+    <!-- STATUS -->
+    <section class="tab active" id="tab-status">
+      <div class="topbar">
+        <div>
+          <h2>Worker status</h2>
+          <p class="muted" id="pathLine">…</p>
+        </div>
+        <div class="actions">
+          <button class="btn ghost" id="btnInstall">Install worker</button>
+          <button class="btn" id="btnStart">Start</button>
+          <button class="btn danger" id="btnStop">Stop worker</button>
+        </div>
+      </div>
+
+      <div class="cards">
+        <div class="card"><div class="k">Service</div><div class="v" id="cService">—</div></div>
+        <div class="card"><div class="k">Worker</div><div class="v" id="cState">—</div></div>
+        <div class="card"><div class="k">PID</div><div class="v" id="cPid">—</div></div>
+        <div class="card"><div class="k">Heartbeat</div><div class="v" id="cHeart">—</div></div>
+        <div class="card"><div class="k">Last run</div><div class="v mono" id="cLast">—</div></div>
+        <div class="card"><div class="k">Blocked Apps</div><div class="v badge-val" id="cBlocked">—</div></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">Last script output <button class="mini" id="btnScriptPath">path</button></div>
+        <pre id="output" class="mono">(none yet)</pre>
+      </div>
+    </section>
+
+    <!-- APP CONTROL / BLOCKER -->
+    <section class="tab" id="tab-appcontrol">
+      <div class="topbar">
+        <div>
+          <h2>Application Control & Blocking</h2>
+          <p class="muted">Enforce which apps can open on this PC. Multi-layered Windows protection (IFEO + DisallowRun + Agent Watcher).</p>
+        </div>
+        <div class="actions">
+          <div class="lock-status-badge locked" id="lockBadge"><span class="lock-icon">&#128274;</span> Locked (View Only)</div>
+          <button class="btn primary" id="btnUnlockEdit">&#128275; Unlock to Edit</button>
+          <button class="btn ghost" id="btnLockEdit" style="display:none;">&#128274; Lock</button>
+          <button class="btn ghost" id="btnRefreshRules">Refresh</button>
+        </div>
+      </div>
+
+      <!-- How it works banner -->
+      <div class="info-card">
+        <div class="info-header">
+          <span class="info-icon">&#9432;</span>
+          <strong>How the OM Agent stops applications from opening:</strong>
+        </div>
+        <div class="info-body">
+          <ul>
+            <li><strong>Layer 1 — Image File Execution Options (IFEO):</strong> Windows kernel intercepts the executable launch and redirects execution. The application process never starts!</li>
+            <li><strong>Layer 2 — Windows Explorer DisallowRun Policy:</strong> Windows displays a system policy message preventing launch via desktop or Start Menu.</li>
+            <li><strong>Layer 3 — Real-Time Agent Watcher:</strong> The OM background service terminates any running instances every cycle.</li>
+            <li><strong>Safe Whitelist:</strong> Critical Windows processes (<code>explorer.exe</code>, <code>cmd.exe</code>, <code>powershell.exe</code>) and the OM Agent are protected from accidental blocking.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Test Phase Card -->
+      <div class="panel test-phase-panel">
+        <div class="panel-title-bar">
+          <div class="panel-title">&#129514; Test Phase: Verify Application Blocking</div>
+          <span class="test-status-pill idle" id="testStatusPill">Test: Ready</span>
+        </div>
+        <p class="muted" style="margin-bottom: 14px;">
+          Run this test to verify with your own eyes that the agent stops apps from opening. Notepad (<code>notepad.exe</code>) is selected by default as a safe test app.
+        </p>
+
+        <div class="test-controls-row">
+          <div class="field slim" style="margin-bottom:0; max-width: 280px;">
+            <span>Test Target Application</span>
+            <input type="text" id="testTargetApp" value="notepad.exe" placeholder="e.g. notepad.exe">
+          </div>
+          <div class="test-buttons-group">
+            <button class="btn danger" id="btnTestStart">&#128683; 1. Block Test App</button>
+            <button class="btn primary" id="btnTestLaunch">&#9658; 2. Try Launching App (Verify)</button>
+            <button class="btn ghost" id="btnTestEnd">&#10004; 3. End Test & Restore</button>
+          </div>
+        </div>
+
+        <div class="test-notice" id="testNotice">
+          Click <strong>"1. Block Test App"</strong> above. Once blocked, try opening Notepad on your PC (press <kbd>Win+R</kbd> &rarr; type <code>notepad</code> &rarr; Enter). Windows will refuse to open it!
+        </div>
+
+        <div class="panel-title" style="margin-top:14px;">Test Verification Log</div>
+        <pre id="testLog" class="mono test-console">[Ready] Select target and click "1. Block Test App" to begin test phase.</pre>
+      </div>
+
+      <!-- Add Rule Form (Unlocked only) -->
+      <div class="panel" id="addRulePanel" style="display:none; margin-top:20px;">
+        <div class="panel-title">&#10133; Add New Application Rule (Password Verified)</div>
+        <div class="row" style="margin-bottom:0;">
+          <div class="field slim">
+            <span>Executable Name (.exe)</span>
+            <input type="text" id="newAppExe" placeholder="e.g. chrome.exe, calc.exe, game.exe">
+          </div>
+          <div class="field slim">
+            <span>Friendly Label</span>
+            <input type="text" id="newAppLabel" placeholder="e.g. Google Chrome, Calculator">
+          </div>
+          <div class="field slim" style="max-width:140px;">
+            <span>Action</span>
+            <select id="newAppAction">
+              <option value="BLOCK">BLOCK</option>
+              <option value="ALLOW">ALLOW</option>
+            </select>
+          </div>
+          <button class="btn primary" id="btnAddRule" style="height:42px; margin-bottom:2px;">Save Rule</button>
+        </div>
+      </div>
+
+      <!-- Rules List Table -->
+      <div class="panel" style="margin-top:20px;">
+        <div class="panel-title-bar">
+          <div class="panel-title">&#128737; Configured Application Rules</div>
+          <span class="muted" id="rulesCountLabel">0 rules configured</span>
+        </div>
+        <div class="table-container">
+          <table class="rules-table">
+            <thead>
+              <tr>
+                <th style="width:110px;">Status</th>
+                <th>Application</th>
+                <th>Description</th>
+                <th style="width:110px;">Action</th>
+                <th style="width:180px; text-align:right;">Control</th>
+              </tr>
+            </thead>
+            <tbody id="rulesTableBody">
+              <tr><td colspan="5" style="text-align:center; padding:20px;" class="muted">Loading application rules…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- COMMANDS -->
+    <section class="tab" id="tab-commands">
+      <div class="topbar"><div><h2>Run a command</h2><p class="muted">Open a shell as ADMIN or USER, in cmd or PowerShell.</p></div></div>
+      <div class="panel">
+        <label class="field"><span>Command</span>
+          <input id="cmdInput" type="text" spellcheck="false" placeholder="whoami   |   netsh ...   |   Get-Process">
+        </label>
+        <div class="row">
+          <label class="field slim"><span>Shell</span>
+            <select id="shellSel"><option value="cmd">Command Prompt (cmd)</option><option value="powershell">PowerShell</option></select>
+          </label>
+          <label class="field slim"><span>Context</span>
+            <select id="ctxSel"><option value="admin">ADMIN (SYSTEM)</option><option value="user">USER (logged-in)</option></select>
+          </label>
+          <button class="btn primary" id="btnRun">Run</button>
+        </div>
+        <div class="panel-title">Output</div>
+        <pre id="cmdOut" class="mono">…</pre>
+      </div>
+    </section>
+
+    <!-- LOG -->
+    <section class="tab" id="tab-log">
+      <div class="topbar">
+        <div><h2>Command center log</h2><p class="muted">Tail of the worker log.</p></div>
+        <div class="actions"><button class="btn ghost" id="btnOpenLog">Open log file</button><button class="btn" id="btnRefreshLog">Refresh</button></div>
+      </div>
+      <div class="panel"><div class="panel-title">Log</div><pre id="logOut" class="mono">…</pre></div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="tab" id="tab-about">
+      <div class="topbar"><div><h2>About</h2></div></div>
+      <div class="panel about">
+        <p><strong>OM Client</strong> control center for the OM Background Worker and Application Control Engine.</p>
+        <p>The worker is a headless Windows service that runs at boot (before login), keeps running,
+        and enforces application blocking even if the UI is closed. This UI is the dashboard and rule editor.</p>
+        <ul>
+          <li><b>App Control:</b> Configure blocked and allowed apps with password protection (password: <code>om</code>).</li>
+          <li><b>Test Phase:</b> Interactively test app blocking on <code>notepad.exe</code> or custom targets.</li>
+          <li><b>Multi-Layer Blocking:</b> Registry IFEO redirection, DisallowRun Explorer policies, and background watcher.</li>
+          <li><b>Install worker:</b> Registers the service (auto-start + recovery) and deploys the persistent script.</li>
+          <li><b>Stop worker:</b> Stops the service and kills any running script/command process.</li>
+          <li><b>Commands:</b> Run as ADMIN (SYSTEM) or the logged-in USER, in cmd or PowerShell.</li>
+          <li>Windows Firewall is left untouched — no inbound port is opened.</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Password Unlock Modal -->
+<div class="modal-backdrop" id="pwdModal" style="display:none;">
+  <div class="modal-card">
+    <div class="modal-header">
+      <span class="modal-icon">&#128274;</span>
+      <h3>Administrator Verification</h3>
+    </div>
+    <p class="modal-desc">
+      Modifying application control rules and activating test blocks requires the administrator password.
+    </p>
+    <div class="field" style="margin: 16px 0 10px 0;">
+      <span>Password</span>
+      <input type="password" id="pwdInput" placeholder="Enter password (hint: om)" autocomplete="off">
+    </div>
+    <div class="modal-error" id="pwdError" style="display:none;">Incorrect password. Please use 'om'.</div>
+    <div class="modal-actions">
+      <button class="btn ghost" id="btnCancelModal">Cancel</button>
+      <button class="btn primary" id="btnSubmitModal">Unlock</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+<script src="renderer.js"></script>
+</body>
+</html>

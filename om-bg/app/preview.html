@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OM Client — Control Center</title>
+<style>:root{
+  --bg:#0b1220; --panel:#111a2c; --panel2:#0e1728; --line:#1c2a44;
+  --text:#e8eefc; --muted:#8aa0c4; --accent:#5b8cff; --accent2:#22c55e;
+  --danger:#ef4444; --warn:#f59e0b; --mono:'JetBrains Mono','Consolas',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);font-size:14px}
+.app{display:flex;height:100vh;overflow:hidden}
+
+/* sidebar */
+.sidebar{width:230px;background:var(--panel2);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:20px 14px}
+.brand{display:flex;gap:12px;align-items:center;margin-bottom:26px}
+.logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--accent),#7c3aed);display:grid;place-items:center;font-weight:800;font-size:18px;color:#fff}
+.brandtext h1{font-size:16px;font-weight:700}.brandtext span{color:var(--muted);font-size:12px}
+nav{display:flex;flex-direction:column;gap:4px}
+.nav-item{display:flex;align-items:center;gap:10px;background:none;border:none;color:var(--muted);padding:11px 12px;border-radius:9px;cursor:pointer;font-size:14px;text-align:left}
+.nav-item:hover{background:#16223a;color:var(--text)}
+.nav-item.active{background:linear-gradient(90deg,rgba(91,140,255,.16),transparent);color:#fff;border-left:3px solid var(--accent)}
+.nav-item .ic{width:18px;text-align:center}
+.sidebar-foot{margin-top:auto}
+.svc-pill{background:#16223a;border-radius:10px;padding:10px;text-align:center;font-size:12px;color:var(--muted)}
+.svc-pill.ok{color:var(--accent2)}
+.svc-pill.bad{color:var(--danger)}
+
+/* content */
+.content{flex:1;overflow-y:auto;padding:26px 30px}
+.tab{display:none}
+.tab.active{display:block}
+.topbar{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px}
+.topbar h2{font-size:21px;font-weight:700}
+.muted{color:var(--muted);font-size:13px;margin-top:4px}
+.actions{display:flex;gap:10px;align-items:center}
+
+/* buttons */
+.btn{background:var(--accent);color:#fff;border:none;padding:10px 16px;border-radius:9px;cursor:pointer;font-size:14px;font-weight:600;transition:.15s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{filter:brightness(1.1)}
+.btn.danger{background:var(--danger)}
+.btn.primary{background:var(--accent)}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--text)}
+.btn.ghost:hover{background:#16223a}
+.btn.sm{padding:6px 10px;font-size:12px;border-radius:6px}
+.mini{background:none;border:none;color:var(--accent);font-size:12px;cursor:pointer;margin-left:8px}
+
+/* cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px;margin-bottom:22px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px}
+.card .k{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.4px}
+.card .v{margin-top:7px;font-size:19px;font-weight:700}
+.card .v.mono{font-size:13px}
+.card .v.badge-val{color:var(--danger)}
+
+/* panels */
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px}
+.panel-title{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+.panel-title-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+pre.mono{font-family:var(--mono);font-size:12.5px;line-height:1.55;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:14px;overflow:auto;max-height:340px;white-space:pre-wrap;color:#cfe0ff}
+
+/* forms */
+.field{display:block;margin-bottom:14px}
+.field span{color:var(--muted);font-size:12px;margin-bottom:6px;display:block}
+.field input,.field select{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:9px;color:var(--text);padding:12px 14px;font-size:14px;font-family:var(--mono)}
+.field.slim{flex:1}
+.field.slim input,.field.slim select{font-family:'Segoe UI',sans-serif}
+.row{display:flex;gap:14px;align-items:flex-end;margin-bottom:16px}
+.row .btn{margin-bottom:2px;height:42px}
+
+/* Info banner */
+.info-card{background:linear-gradient(135deg,rgba(91,140,255,.08),rgba(14,23,40,.8));border:1px solid rgba(91,140,255,.25);border-radius:12px;padding:16px;margin-bottom:20px}
+.info-header{display:flex;align-items:center;gap:8px;font-size:14px;color:#cfe0ff;margin-bottom:8px}
+.info-icon{font-size:16px;color:var(--accent)}
+.info-body ul{margin:0 0 0 20px;color:var(--muted);font-size:13px;line-height:1.6}
+.info-body strong{color:var(--text)}
+.info-body code{background:#16223a;color:#a5b4fc;padding:2px 5px;border-radius:4px;font-family:var(--mono);font-size:12px}
+
+/* Lock Status Badge */
+.lock-status-badge{padding:6px 12px;border-radius:8px;font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:6px}
+.lock-status-badge.locked{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);color:var(--warn)}
+.lock-status-badge.unlocked{background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.3);color:var(--accent2)}
+
+/* Test Phase Panel */
+.test-phase-panel{border:1px solid rgba(239,68,68,.3);background:linear-gradient(180deg,#121b2d 0%,#0e1728 100%)}
+.test-status-pill{padding:4px 10px;border-radius:12px;font-size:11px;font-weight:700;text-transform:uppercase}
+.test-status-pill.idle{background:#1e293b;color:var(--muted)}
+.test-status-pill.active{background:rgba(239,68,68,.2);color:var(--danger);border:1px solid var(--danger)}
+.test-status-pill.verified{background:rgba(34,197,94,.2);color:var(--accent2);border:1px solid var(--accent2)}
+.test-controls-row{display:flex;gap:16px;align-items:flex-end;margin-bottom:14px;flex-wrap:wrap}
+.test-buttons-group{display:flex;gap:8px;flex-wrap:wrap}
+.test-notice{background:#16223a;border-left:4px solid var(--accent);padding:10px 14px;border-radius:6px;font-size:13px;color:#cbd5e1;margin-bottom:10px}
+.test-notice kbd{background:#0b1220;border:1px solid var(--line);border-radius:4px;padding:2px 6px;font-family:var(--mono);font-size:12px;color:#f8fafc}
+.test-console{background:#070d17;border:1px solid #1a2842;color:#93c5fd;min-height:100px;max-height:180px}
+
+/* App Rules Table */
+.table-container{overflow-x:auto;margin-top:6px}
+.rules-table{width:100%;border-collapse:collapse;text-align:left;font-size:13px}
+.rules-table th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.5px;padding:10px 12px;border-bottom:1px solid var(--line)}
+.rules-table td{padding:12px;border-bottom:1px solid #142137;vertical-align:middle}
+.rules-table tr:hover td{background:#142139}
+.badge-block{background:rgba(239,68,68,.16);color:var(--danger);border:1px solid rgba(239,68,68,.3);padding:4px 8px;border-radius:6px;font-weight:700;font-size:11px;display:inline-flex;align-items:center;gap:4px}
+.badge-allow{background:rgba(34,197,94,.16);color:var(--accent2);border:1px solid rgba(34,197,94,.3);padding:4px 8px;border-radius:6px;font-weight:700;font-size:11px;display:inline-flex;align-items:center;gap:4px}
+.app-name-code{font-family:var(--mono);font-size:13px;color:#fff;font-weight:600}
+.table-actions{display:flex;gap:6px;justify-content:flex-end}
+
+/* Modal */
+.modal-backdrop{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:999;backdrop-filter:blur(3px)}
+.modal-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;width:100%;max-width:420px;padding:24px;box-shadow:0 20px 40px rgba(0,0,0,.5)}
+.modal-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.modal-icon{font-size:20px}
+.modal-header h3{font-size:18px;font-weight:700}
+.modal-desc{color:var(--muted);font-size:13px;line-height:1.5}
+.modal-error{color:var(--danger);font-size:12px;margin-bottom:10px;padding:6px 10px;background:rgba(239,68,68,.1);border-radius:6px}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:16px}
+
+/* about */
+.about p{margin-bottom:12px;line-height:1.5}
+.about ul{margin:12px 0 12px 20px;line-height:1.6}
+.about b{color:var(--accent)}
+
+/* toast */
+#toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#16223a;border:1px solid var(--line);padding:12px 18px;border-radius:9px;font-size:13px;opacity:0;transition:.25s;z-index:1000;max-width:80%;box-shadow:0 8px 24px rgba(0,0,0,.4)}
+#toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">OM</div>
+      <div class="brandtext"><h1>OM Client</h1><span>Control Center</span></div>
+    </div>
+    <nav>
+      <button class="nav-item active" data-tab="status"><span class="ic">&#9679;</span> Dashboard</button>
+      <button class="nav-item" data-tab="appcontrol"><span class="ic">&#128737;</span> App Control</button>
+      <button class="nav-item" data-tab="commands"><span class="ic">&#187;</span> Commands</button>
+      <button class="nav-item" data-tab="log"><span class="ic">&#188;</span> Logs</button>
+      <button class="nav-item" data-tab="about"><span class="ic">&#9432;</span> About</button>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="svc-pill" id="svcPill">…</div>
+    </div>
+  </aside>
+
+  <main class="content">
+    <!-- STATUS -->
+    <section class="tab active" id="tab-status">
+      <div class="topbar">
+        <div>
+          <h2>Worker status</h2>
+          <p class="muted" id="pathLine">…</p>
+        </div>
+        <div class="actions">
+          <button class="btn ghost" id="btnInstall">Install worker</button>
+          <button class="btn" id="btnStart">Start</button>
+          <button class="btn danger" id="btnStop">Stop worker</button>
+        </div>
+      </div>
+
+      <div class="cards">
+        <div class="card"><div class="k">Service</div><div class="v" id="cService">—</div></div>
+        <div class="card"><div class="k">Worker</div><div class="v" id="cState">—</div></div>
+        <div class="card"><div class="k">PID</div><div class="v" id="cPid">—</div></div>
+        <div class="card"><div class="k">Heartbeat</div><div class="v" id="cHeart">—</div></div>
+        <div class="card"><div class="k">Last run</div><div class="v mono" id="cLast">—</div></div>
+        <div class="card"><div class="k">Blocked Apps</div><div class="v badge-val" id="cBlocked">—</div></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-title">Last script output <button class="mini" id="btnScriptPath">path</button></div>
+        <pre id="output" class="mono">(none yet)</pre>
+      </div>
+    </section>
+
+    <!-- APP CONTROL / BLOCKER -->
+    <section class="tab" id="tab-appcontrol">
+      <div class="topbar">
+        <div>
+          <h2>Application Control & Blocking</h2>
+          <p class="muted">Enforce which apps can open on this PC. Multi-layered Windows protection (IFEO + DisallowRun + Agent Watcher).</p>
+        </div>
+        <div class="actions">
+          <div class="lock-status-badge locked" id="lockBadge"><span class="lock-icon">&#128274;</span> Locked (View Only)</div>
+          <button class="btn primary" id="btnUnlockEdit">&#128275; Unlock to Edit</button>
+          <button class="btn ghost" id="btnLockEdit" style="display:none;">&#128274; Lock</button>
+          <button class="btn ghost" id="btnRefreshRules">Refresh</button>
+        </div>
+      </div>
+
+      <!-- How it works banner -->
+      <div class="info-card">
+        <div class="info-header">
+          <span class="info-icon">&#9432;</span>
+          <strong>How the OM Agent stops applications from opening:</strong>
+        </div>
+        <div class="info-body">
+          <ul>
+            <li><strong>Layer 1 — Image File Execution Options (IFEO):</strong> Windows kernel intercepts the executable launch and redirects execution. The application process never starts!</li>
+            <li><strong>Layer 2 — Windows Explorer DisallowRun Policy:</strong> Windows displays a system policy message preventing launch via desktop or Start Menu.</li>
+            <li><strong>Layer 3 — Real-Time Agent Watcher:</strong> The OM background service terminates any running instances every cycle.</li>
+            <li><strong>Safe Whitelist:</strong> Critical Windows processes (<code>explorer.exe</code>, <code>cmd.exe</code>, <code>powershell.exe</code>) and the OM Agent are protected from accidental blocking.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Test Phase Card -->
+      <div class="panel test-phase-panel">
+        <div class="panel-title-bar">
+          <div class="panel-title">&#129514; Test Phase: Verify Application Blocking</div>
+          <span class="test-status-pill idle" id="testStatusPill">Test: Ready</span>
+        </div>
+        <p class="muted" style="margin-bottom: 14px;">
+          Run this test to verify with your own eyes that the agent stops apps from opening. Notepad (<code>notepad.exe</code>) is selected by default as a safe test app.
+        </p>
+
+        <div class="test-controls-row">
+          <div class="field slim" style="margin-bottom:0; max-width: 280px;">
+            <span>Test Target Application</span>
+            <input type="text" id="testTargetApp" value="notepad.exe" placeholder="e.g. notepad.exe">
+          </div>
+          <div class="test-buttons-group">
+            <button class="btn danger" id="btnTestStart">&#128683; 1. Block Test App</button>
+            <button class="btn primary" id="btnTestLaunch">&#9658; 2. Try Launching App (Verify)</button>
+            <button class="btn ghost" id="btnTestEnd">&#10004; 3. End Test & Restore</button>
+          </div>
+        </div>
+
+        <div class="test-notice" id="testNotice">
+          Click <strong>"1. Block Test App"</strong> above. Once blocked, try opening Notepad on your PC (press <kbd>Win+R</kbd> &rarr; type <code>notepad</code> &rarr; Enter). Windows will refuse to open it!
+        </div>
+
+        <div class="panel-title" style="margin-top:14px;">Test Verification Log</div>
+        <pre id="testLog" class="mono test-console">[Ready] Select target and click "1. Block Test App" to begin test phase.</pre>
+      </div>
+
+      <!-- Add Rule Form (Unlocked only) -->
+      <div class="panel" id="addRulePanel" style="display:none; margin-top:20px;">
+        <div class="panel-title">&#10133; Add New Application Rule (Password Verified)</div>
+        <div class="row" style="margin-bottom:0;">
+          <div class="field slim">
+            <span>Executable Name (.exe)</span>
+            <input type="text" id="newAppExe" placeholder="e.g. chrome.exe, calc.exe, game.exe">
+          </div>
+          <div class="field slim">
+            <span>Friendly Label</span>
+            <input type="text" id="newAppLabel" placeholder="e.g. Google Chrome, Calculator">
+          </div>
+          <div class="field slim" style="max-width:140px;">
+            <span>Action</span>
+            <select id="newAppAction">
+              <option value="BLOCK">BLOCK</option>
+              <option value="ALLOW">ALLOW</option>
+            </select>
+          </div>
+          <button class="btn primary" id="btnAddRule" style="height:42px; margin-bottom:2px;">Save Rule</button>
+        </div>
+      </div>
+
+      <!-- Rules List Table -->
+      <div class="panel" style="margin-top:20px;">
+        <div class="panel-title-bar">
+          <div class="panel-title">&#128737; Configured Application Rules</div>
+          <span class="muted" id="rulesCountLabel">0 rules configured</span>
+        </div>
+        <div class="table-container">
+          <table class="rules-table">
+            <thead>
+              <tr>
+                <th style="width:110px;">Status</th>
+                <th>Application</th>
+                <th>Description</th>
+                <th style="width:110px;">Action</th>
+                <th style="width:180px; text-align:right;">Control</th>
+              </tr>
+            </thead>
+            <tbody id="rulesTableBody">
+              <tr><td colspan="5" style="text-align:center; padding:20px;" class="muted">Loading application rules…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- COMMANDS -->
+    <section class="tab" id="tab-commands">
+      <div class="topbar"><div><h2>Run a command</h2><p class="muted">Open a shell as ADMIN or USER, in cmd or PowerShell.</p></div></div>
+      <div class="panel">
+        <label class="field"><span>Command</span>
+          <input id="cmdInput" type="text" spellcheck="false" placeholder="whoami   |   netsh ...   |   Get-Process">
+        </label>
+        <div class="row">
+          <label class="field slim"><span>Shell</span>
+            <select id="shellSel"><option value="cmd">Command Prompt (cmd)</option><option value="powershell">PowerShell</option></select>
+          </label>
+          <label class="field slim"><span>Context</span>
+            <select id="ctxSel"><option value="admin">ADMIN (SYSTEM)</option><option value="user">USER (logged-in)</option></select>
+          </label>
+          <button class="btn primary" id="btnRun">Run</button>
+        </div>
+        <div class="panel-title">Output</div>
+        <pre id="cmdOut" class="mono">…</pre>
+      </div>
+    </section>
+
+    <!-- LOG -->
+    <section class="tab" id="tab-log">
+      <div class="topbar">
+        <div><h2>Command center log</h2><p class="muted">Tail of the worker log.</p></div>
+        <div class="actions"><button class="btn ghost" id="btnOpenLog">Open log file</button><button class="btn" id="btnRefreshLog">Refresh</button></div>
+      </div>
+      <div class="panel"><div class="panel-title">Log</div><pre id="logOut" class="mono">…</pre></div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="tab" id="tab-about">
+      <div class="topbar"><div><h2>About</h2></div></div>
+      <div class="panel about">
+        <p><strong>OM Client</strong> control center for the OM Background Worker and Application Control Engine.</p>
+        <p>The worker is a headless Windows service that runs at boot (before login), keeps running,
+        and enforces application blocking even if the UI is closed. This UI is the dashboard and rule editor.</p>
+        <ul>
+          <li><b>App Control:</b> Configure blocked and allowed apps with password protection (password: <code>om</code>).</li>
+          <li><b>Test Phase:</b> Interactively test app blocking on <code>notepad.exe</code> or custom targets.</li>
+          <li><b>Multi-Layer Blocking:</b> Registry IFEO redirection, DisallowRun Explorer policies, and background watcher.</li>
+          <li><b>Install worker:</b> Registers the service (auto-start + recovery) and deploys the persistent script.</li>
+          <li><b>Stop worker:</b> Stops the service and kills any running script/command process.</li>
+          <li><b>Commands:</b> Run as ADMIN (SYSTEM) or the logged-in USER, in cmd or PowerShell.</li>
+          <li>Windows Firewall is left untouched — no inbound port is opened.</li>
+        </ul>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Password Unlock Modal -->
+<div class="modal-backdrop" id="pwdModal" style="display:none;">
+  <div class="modal-card">
+    <div class="modal-header">
+      <span class="modal-icon">&#128274;</span>
+      <h3>Administrator Verification</h3>
+    </div>
+    <p class="modal-desc">
+      Modifying application control rules and activating test blocks requires the administrator password.
+    </p>
+    <div class="field" style="margin: 16px 0 10px 0;">
+      <span>Password</span>
+      <input type="password" id="pwdInput" placeholder="Enter password (hint: om)" autocomplete="off">
+    </div>
+    <div class="modal-error" id="pwdError" style="display:none;">Incorrect password. Please use 'om'.</div>
+    <div class="modal-actions">
+      <button class="btn ghost" id="btnCancelModal">Cancel</button>
+      <button class="btn primary" id="btnSubmitModal">Unlock</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+<script>function $(id) { return document.getElementById(id); }
+
+// ---- API bridge: WebView2 messaging, with rich MOCK fallback for browser preview ----
+const hasWebview = typeof window !== 'undefined' && window.chrome && window.chrome.webview && window.chrome.webview.postMessage;
+
+let mockUnlocked = false;
+let mockRules = [
+  { id: "RULE-01", application: "notepad.exe", friendlyName: "Windows Notepad (Test Target)", action: "BLOCK", enabled: false, updatedAt: new Date().toISOString() },
+  { id: "RULE-02", application: "calc.exe", friendlyName: "Windows Calculator", action: "BLOCK", enabled: true, updatedAt: new Date().toISOString() },
+  { id: "RULE-03", application: "discord.exe", friendlyName: "Discord Messenger", action: "BLOCK", enabled: true, updatedAt: new Date().toISOString() },
+  { id: "RULE-04", application: "game.exe", friendlyName: "Game Executable", action: "BLOCK", enabled: true, updatedAt: new Date().toISOString() }
+];
+
+let mockTestLog = ["[Ready] Select target and click '1. Block Test App' to begin test phase."];
+let mockTestActive = false;
+
+const MOCK = {
+  status: async () => ({
+    service: 'Running',
+    status: {
+      state: 'RUNNING', processId: 4182, lastScriptPid: 5120,
+      lastHeartbeatUtc: new Date().toISOString(), lastRunAtUtc: new Date().toISOString(), lastRunStatus: 'OK',
+      scriptUseCount: 142, blockedAppsCount: mockRules.filter(r => r.action === 'BLOCK' && r.enabled).length,
+      lastOutput: 'Computer : DESKTOP-OM\\nUser     : NT AUTHORITY\\\\SYSTEM\\nOS       : Windows 10/11 (23H2)\\nRAM free : 8.2 GB of 16.0 GB\\nEnforcing App Control: Active rules applied\\nworker finished cycle at ' + new Date().toLocaleTimeString()
+    }
+  }),
+  install: async () => ({ code: 0, out: '[SC] CreateService SUCCESS\\nDeployed worker to C:\\\\ProgramData\\\\OMAgent\\\\OMAgent.exe' }),
+  start: async () => '', stop: async () => '', uninstall: async () => '',
+  runCommand: async (cmd, shell, asUser) => ({
+    code: 0,
+    Output: 'Windows 10 Pro\\n' + (asUser ? 'USER (interactive)' : 'ADMIN (SYSTEM)') + ' / ' + shell + ' ran:\\n' + cmd + '\\n[exit code 0]'
+  }),
+  log: async () => '2026-08-27 10:20:11.000 [INFO ] Worker cycle finished (exit=0, timedOut=False).\\n2026-08-27 10:20:11.000 [INFO ] Enforcing AppControl: Active IFEO & DisallowRun rules\\n2026-08-27 10:20:26.000 [INFO ] Heartbeat 10:20:26',
+  scriptPath: async () => 'C:\\\\ProgramData\\\\OMAgent\\\\worker.ps1',
+  openFolder: async () => '', openLog: async () => '',
+  pathInfo: async () => ({ dataDir: 'C:\\\\ProgramData\\\\OMAgent', script: 'worker.ps1', log: 'Logs', appControl: 'appcontrol.json' }),
+
+  // App Control Mock
+  appControlGet: async () => ({
+    config: {
+      version: 1,
+      enforcementMode: 'Active (IFEO + DisallowRun + Real-time Watcher)',
+      rules: mockRules,
+      testPhase: { active: mockTestActive, targetApp: 'notepad.exe', lastTestLog: mockTestLog }
+    },
+    isWindows: true
+  }),
+  appControlCheckPass: async (pass) => ({ valid: pass === 'om' }),
+  appControlAddRule: async ({ password, application, friendlyName, action }) => {
+    if (password !== 'om') return { success: false, error: "Access Denied: Incorrect password. Use 'om' to edit rules." };
+    const exe = application.toLowerCase().endsWith('.exe') ? application.toLowerCase() : application.toLowerCase() + '.exe';
+    mockRules.push({
+      id: 'RULE-' + Math.random().toString(36).substring(2, 8).toUpperCase(),
+      application: exe,
+      friendlyName: friendlyName || exe,
+      action: action || 'BLOCK',
+      enabled: true,
+      updatedAt: new Date().toISOString()
+    });
+    return { success: true, message: `Rule for '${exe}' saved and enforced!` };
+  },
+  appControlToggleRule: async ({ password, id, enabled }) => {
+    if (password !== 'om') return { success: false, error: "Access Denied: Password 'om' required." };
+    const r = mockRules.find(x => x.id === id);
+    if (r) { r.enabled = enabled; return { success: true, rule: r }; }
+    return { success: false, error: "Rule not found." };
+  },
+  appControlDeleteRule: async ({ password, id }) => {
+    if (password !== 'om') return { success: false, error: "Access Denied: Password 'om' required." };
+    const idx = mockRules.findIndex(x => x.id === id);
+    if (idx >= 0) {
+      const removed = mockRules.splice(idx, 1)[0];
+      return { success: true, message: `Rule for '${removed.application}' deleted.` };
+    }
+    return { success: false, error: "Rule not found." };
+  },
+  appControlTestStart: async ({ password, targetApp }) => {
+    if (password !== 'om') return { success: false, error: "Access Denied: Password 'om' required to start test phase." };
+    const exe = targetApp.toLowerCase().endsWith('.exe') ? targetApp.toLowerCase() : targetApp.toLowerCase() + '.exe';
+    mockTestActive = true;
+    const now = new Date().toLocaleTimeString();
+    mockTestLog = [
+      `[${now}] Starting Test Phase for: ${exe}`,
+      `[${now}] [IFEO] Registry debugger redirect set -> systray.exe`,
+      `[${now}] [DisallowRun] Policy rule registered in Explorer`,
+      `[${now}] [Process] Active watcher monitoring ${exe}`,
+      `[${now}] TEST BLOCK ACTIVE: Windows will now refuse to open ${exe}!`
+    ];
+    return { success: true, target: exe, message: `Test Block ACTIVE for ${exe}! Try opening ${exe} on your PC to verify.`, log: mockTestLog };
+  },
+  appControlTestLaunch: async ({ targetApp }) => {
+    const exe = targetApp.toLowerCase().endsWith('.exe') ? targetApp.toLowerCase() : targetApp.toLowerCase() + '.exe';
+    const now = new Date().toLocaleTimeString();
+    mockTestLog.push(`[${now}] Attempting automated execution of '${exe}'...`);
+    mockTestLog.push(`[${now}] [IFEO Intercept] Windows detected debugger hook: systray.exe`);
+    mockTestLog.push(`[${now}] [BLOCKED] Process creation prevented: Access is denied.`);
+    mockTestLog.push(`[${now}] [SUCCESS] ${exe} was successfully prevented from opening!`);
+    return {
+      success: true,
+      blocked: true,
+      verdict: "PASSED: Application is BLOCKED from opening!",
+      detail: "Windows prevented execution via IFEO Debugger and DisallowRun.",
+      log: mockTestLog
+    };
+  },
+  appControlTestEnd: async ({ password, targetApp }) => {
+    if (password !== 'om') return { success: false, error: "Access Denied: Password 'om' required." };
+    const exe = targetApp.toLowerCase().endsWith('.exe') ? targetApp.toLowerCase() : targetApp.toLowerCase() + '.exe';
+    mockTestActive = false;
+    const now = new Date().toLocaleTimeString();
+    mockTestLog.push(`[${now}] Test Phase ENDED. Removed block for ${exe}.`);
+    mockTestLog.push(`[${now}] [RESTORED] ${exe} can now be opened normally.`);
+    return { success: true, target: exe, message: `Test Phase ended. ${exe} restored to normal execution.`, log: mockTestLog };
+  }
+};
+
+let _seq = 0;
+const _pending = {};
+
+function bridge(type, payload) {
+  return new Promise((resolve, reject) => {
+    const id = 'm' + (++_seq);
+    _pending[id] = { resolve, reject };
+    window.chrome.webview.postMessage({ id, type, payload });
+    setTimeout(() => {
+      if (_pending[id]) {
+        delete _pending[id];
+        resolve({ error: 'timeout' });
+      }
+    }, 60000);
+  });
+}
+
+if (hasWebview) {
+  window.chrome.webview.addEventListener('message', (e) => {
+    const m = e.data;
+    if (!m || !m.id) return;
+    const p = _pending[m.id];
+    if (!p) return;
+    delete _pending[m.id];
+    if (m.error) p.reject(new Error(m.error));
+    else p.resolve(m.data);
+  });
+}
+
+function makeApi() {
+  if (hasWebview) {
+    return {
+      status: () => bridge('status'),
+      install: () => bridge('install'),
+      start: () => bridge('start'),
+      stop: () => bridge('stop'),
+      uninstall: () => bridge('uninstall'),
+      runCommand: (cmd, shell, asUser) => bridge('run-command', { cmd, shell, asUser }),
+      log: () => bridge('log'),
+      scriptPath: () => bridge('script-path'),
+      openFolder: () => bridge('open-folder'),
+      openLog: () => bridge('open-log'),
+      pathInfo: () => bridge('path-info'),
+      // App Control
+      appControlGet: () => bridge('appcontrol-get'),
+      appControlCheckPass: (password) => bridge('appcontrol-check-pass', { password }),
+      appControlAddRule: (data) => bridge('appcontrol-add-rule', data),
+      appControlToggleRule: (data) => bridge('appcontrol-toggle-rule', data),
+      appControlDeleteRule: (data) => bridge('appcontrol-delete-rule', data),
+      appControlTestStart: (data) => bridge('appcontrol-test-start', data),
+      appControlTestLaunch: (data) => bridge('appcontrol-test-launch', data),
+      appControlTestEnd: (data) => bridge('appcontrol-test-end', data)
+    };
+  }
+  return MOCK;
+}
+
+const api = makeApi();
+
+// State
+let isUnlocked = false;
+let currentPassword = '';
+let currentRules = [];
+
+// Toast notification
+function toast(msg, isError = false) {
+  const t = $('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.style.borderColor = isError ? 'var(--danger)' : 'var(--line)';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// Navigation Tabs
+document.querySelectorAll('.nav-item').forEach(b => {
+  b.onclick = () => switchTab(b.dataset.tab);
+});
+
+function switchTab(name) {
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t.id === 'tab-' + name));
+  if (name === 'log') refreshLog();
+  if (name === 'appcontrol') refreshAppControl();
+}
+
+// Dashboard Refresh
+async function refresh() {
+  try {
+    const r = await api.status();
+    const s = r.status || {};
+    const svc = r.service || 'unknown';
+    $('cService').textContent = svc;
+    $('cState').textContent = s.state || '—';
+    $('cPid').textContent = (s.processId || '-') + (s.lastScriptPid > 0 ? ' / script ' + s.lastScriptPid : '');
+    $('cHeart').textContent = s.lastHeartbeatUtc ? new Date(s.lastHeartbeatUtc).toLocaleTimeString() : '—';
+    $('cLast').textContent = (s.lastRunAtUtc ? new Date(s.lastRunAtUtc).toLocaleString() : '—') + (s.lastRunStatus ? ' · ' + s.lastRunStatus : '');
+    $('cBlocked').textContent = (s.blockedAppsCount !== undefined ? s.blockedAppsCount : (currentRules.filter(x => x.action === 'BLOCK' && x.enabled).length)) + ' active';
+
+    $('output').textContent = s.lastOutput || '(none yet)';
+    const pill = $('svcPill');
+    const running = /running/i.test(svc);
+    pill.textContent = running ? '● Service running' : (svc === 'not installed' ? '○ Not installed' : '○ ' + svc);
+    pill.className = 'svc-pill ' + (running ? 'ok' : 'bad');
+  } catch (e) { }
+}
+
+$('btnInstall').onclick = async () => {
+  toast('Installing worker service…');
+  const r = await api.install();
+  toast((r && (r.code === 0 || r === 0)) ? 'Worker service installed successfully!' : 'Install failed: ' + (r && (r.out || r.code)));
+  refresh();
+};
+$('btnStart').onclick = async () => { toast('Starting worker…'); await api.start(); refresh(); };
+$('btnStop').onclick = async () => { toast('Stopping worker and child processes…'); await api.stop(); refresh(); };
+$('btnScriptPath').onclick = async () => { toast('Script: ' + (await api.scriptPath())); };
+
+// Commands Tab
+$('btnRun').onclick = runCmd;
+$('cmdInput').addEventListener('keydown', e => { if (e.key === 'Enter') runCmd(); });
+async function runCmd() {
+  const cmd = $('cmdInput').value.trim();
+  if (!cmd) { toast('Enter a command first.', true); return; }
+  const shell = $('shellSel').value;
+  const asUser = $('ctxSel').value === 'user';
+  $('cmdOut').textContent = 'Running… (' + (asUser ? 'USER' : 'ADMIN') + ' / ' + shell + ')\n\n';
+  try {
+    const r = await api.runCommand(cmd, shell, asUser);
+    const out = (r && (r.Output || r.out)) || '';
+    const code = r ? (r.ExitCode !== undefined ? r.ExitCode : r.code) : '?';
+    $('cmdOut').textContent = out + '\n\n── exit code: ' + (code ?? '?') + ' ──';
+  } catch (e) {
+    $('cmdOut').textContent = 'Error: ' + e.message;
+  }
+}
+
+// Logs Tab
+async function refreshLog() {
+  try { $('logOut').textContent = await api.log(); } catch (e) { $('logOut').textContent = String(e); }
+}
+$('btnRefreshLog').onclick = refreshLog;
+$('btnOpenLog').onclick = () => api.openLog();
+
+// ==========================================
+// APP CONTROL & BLOCKING LOGIC
+// ==========================================
+
+async function refreshAppControl() {
+  try {
+    const res = await api.appControlGet();
+    if (!res || !res.config) return;
+    currentRules = res.config.rules || [];
+    renderRulesTable(currentRules);
+
+    // Update test phase status
+    const tp = res.config.testPhase || {};
+    if (tp.active) {
+      $('testStatusPill').textContent = 'TEST BLOCK ACTIVE';
+      $('testStatusPill').className = 'test-status-pill active';
+      $('testNotice').innerHTML = `⚠️ <strong>TEST BLOCK ACTIVE:</strong> <code>${tp.targetApp || 'notepad.exe'}</code> is currently blocked! Try opening it via Start or Run to verify.`;
+    } else {
+      $('testStatusPill').textContent = 'Test: Ready';
+      $('testStatusPill').className = 'test-status-pill idle';
+    }
+
+    if (tp.lastTestLog && tp.lastTestLog.length > 0) {
+      $('testLog').textContent = tp.lastTestLog.join('\n');
+    }
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+function updateLockUI() {
+  const badge = $('lockBadge');
+  const btnUnlock = $('btnUnlockEdit');
+  const btnLock = $('btnLockEdit');
+  const addPanel = $('addRulePanel');
+
+  if (isUnlocked) {
+    badge.className = 'lock-status-badge unlocked';
+    badge.innerHTML = '<span class="lock-icon">&#128275;</span> Unlocked (Admin Mode)';
+    btnUnlock.style.display = 'none';
+    btnLock.style.display = 'inline-flex';
+    addPanel.style.display = 'block';
+  } else {
+    badge.className = 'lock-status-badge locked';
+    badge.innerHTML = '<span class="lock-icon">&#128274;</span> Locked (View Only)';
+    btnUnlock.style.display = 'inline-flex';
+    btnLock.style.display = 'none';
+    addPanel.style.display = 'none';
+  }
+  renderRulesTable(currentRules);
+}
+
+function renderRulesTable(rules) {
+  const tbody = $('rulesTableBody');
+  const countLabel = $('rulesCountLabel');
+  if (!tbody) return;
+
+  const blockedCount = rules.filter(r => r.action === 'BLOCK' && r.enabled).length;
+  countLabel.textContent = `${rules.length} rules (${blockedCount} actively blocked)`;
+
+  if (rules.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:24px;" class="muted">No application rules configured. Click "Unlock to Edit" to add a rule.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = '';
+  rules.forEach(rule => {
+    const tr = document.createElement('tr');
+
+    // Status
+    const tdStatus = document.createElement('td');
+    if (rule.enabled) {
+      if (rule.action === 'BLOCK') {
+        tdStatus.innerHTML = '<span class="badge-block">&#128683; BLOCKED</span>';
+      } else {
+        tdStatus.innerHTML = '<span class="badge-allow">&#10004; ALLOWED</span>';
+      }
+    } else {
+      tdStatus.innerHTML = '<span class="muted" style="font-size:11px;">(Disabled)</span>';
+    }
+    tr.appendChild(tdStatus);
+
+    // Application
+    const tdApp = document.createElement('td');
+    tdApp.innerHTML = `<span class="app-name-code">${escapeHtml(rule.application)}</span>`;
+    tr.appendChild(tdApp);
+
+    // Description
+    const tdDesc = document.createElement('td');
+    tdDesc.textContent = rule.friendlyName || '—';
+    tr.appendChild(tdDesc);
+
+    // Action
+    const tdAct = document.createElement('td');
+    tdAct.textContent = rule.action;
+    tdAct.style.fontWeight = '600';
+    tdAct.style.color = rule.action === 'BLOCK' ? 'var(--danger)' : 'var(--accent2)';
+    tr.appendChild(tdAct);
+
+    // Actions
+    const tdActions = document.createElement('td');
+    tdActions.className = 'table-actions';
+
+    const btnToggle = document.createElement('button');
+    btnToggle.className = 'btn sm ghost';
+    btnToggle.textContent = rule.enabled ? 'Disable' : 'Enable';
+    btnToggle.disabled = !isUnlocked;
+    btnToggle.onclick = () => toggleRule(rule.id, !rule.enabled);
+    tdActions.appendChild(btnToggle);
+
+    const btnDel = document.createElement('button');
+    btnDel.className = 'btn sm danger';
+    btnDel.innerHTML = '&#128465;';
+    btnDel.title = 'Delete Rule';
+    btnDel.disabled = !isUnlocked;
+    btnDel.onclick = () => deleteRule(rule.id);
+    tdActions.appendChild(btnDel);
+
+    tr.appendChild(tdActions);
+    tbody.appendChild(tr);
+  });
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// Password Modal Handling
+let pendingAction = null;
+
+function requestPassword(action) {
+  if (isUnlocked) {
+    action(currentPassword);
+    return;
+  }
+  pendingAction = action;
+  $('pwdInput').value = '';
+  $('pwdError').style.display = 'none';
+  $('pwdModal').style.display = 'flex';
+  setTimeout(() => $('pwdInput').focus(), 100);
+}
+
+$('btnUnlockEdit').onclick = () => {
+  requestPassword(() => {
+    isUnlocked = true;
+    updateLockUI();
+    toast('Editing unlocked with administrator password "om"!');
+  });
+};
+
+$('btnLockEdit').onclick = () => {
+  isUnlocked = false;
+  currentPassword = '';
+  updateLockUI();
+  toast('App Control locked.');
+};
+
+$('btnCancelModal').onclick = () => {
+  $('pwdModal').style.display = 'none';
+  pendingAction = null;
+};
+
+$('btnSubmitModal').onclick = verifyModalPassword;
+$('pwdInput').addEventListener('keydown', e => { if (e.key === 'Enter') verifyModalPassword(); });
+
+async function verifyModalPassword() {
+  const p = $('pwdInput').value.trim();
+  const res = await api.appControlCheckPass(p);
+  if (res && res.valid) {
+    currentPassword = p;
+    isUnlocked = true;
+    $('pwdModal').style.display = 'none';
+    updateLockUI();
+    if (pendingAction) {
+      const act = pendingAction;
+      pendingAction = null;
+      act(currentPassword);
+    }
+  } else {
+    $('pwdError').style.display = 'block';
+    $('pwdError').textContent = "Incorrect password! Use 'om' to edit rules.";
+    $('pwdInput').select();
+  }
+}
+
+$('btnRefreshRules').onclick = () => {
+  refreshAppControl();
+  toast('Application rules refreshed.');
+};
+
+// Add Rule
+$('btnAddRule').onclick = async () => {
+  const app = $('newAppExe').value.trim();
+  const friendly = $('newAppLabel').value.trim();
+  const act = $('newAppAction').value;
+
+  if (!app) {
+    toast('Please enter an application executable (e.g. notepad.exe).', true);
+    return;
+  }
+
+  requestPassword(async (pwd) => {
+    const res = await api.appControlAddRule({
+      password: pwd,
+      application: app,
+      friendlyName: friendly,
+      action: act
+    });
+
+    if (res && res.success) {
+      toast(res.message || 'Rule saved successfully!');
+      $('newAppExe').value = '';
+      $('newAppLabel').value = '';
+      refreshAppControl();
+    } else {
+      toast((res && res.error) || 'Failed to add rule', true);
+    }
+  });
+};
+
+async function toggleRule(id, enabled) {
+  requestPassword(async (pwd) => {
+    const res = await api.appControlToggleRule({ password: pwd, id, enabled });
+    if (res && res.success) {
+      toast('Rule updated.');
+      refreshAppControl();
+    } else {
+      toast((res && res.error) || 'Toggle failed', true);
+    }
+  });
+}
+
+async function deleteRule(id) {
+  requestPassword(async (pwd) => {
+    const res = await api.appControlDeleteRule({ password: pwd, id });
+    if (res && res.success) {
+      toast(res.message || 'Rule deleted.');
+      refreshAppControl();
+    } else {
+      toast((res && res.error) || 'Delete failed', true);
+    }
+  });
+}
+
+// ==========================================
+// TEST PHASE LOGIC
+// ==========================================
+
+$('btnTestStart').onclick = () => {
+  const target = $('testTargetApp').value.trim() || 'notepad.exe';
+  requestPassword(async (pwd) => {
+    $('testLog').textContent = `[${new Date().toLocaleTimeString()}] Sending block command for ${target}...`;
+    const res = await api.appControlTestStart({ password: pwd, targetApp: target });
+    if (res && res.success) {
+      $('testStatusPill').textContent = 'TEST BLOCK ACTIVE';
+      $('testStatusPill').className = 'test-status-pill active';
+      $('testNotice').innerHTML = `⚠️ <strong>TEST BLOCK ACTIVE:</strong> <code>${target}</code> is now blocked! Try opening it via Start or Run to verify.`;
+      if (res.log) $('testLog').textContent = res.log.join('\n');
+      toast(res.message || `Test block active for ${target}`);
+      refreshAppControl();
+    } else {
+      toast((res && res.error) || 'Test block failed', true);
+    }
+  });
+};
+
+$('btnTestLaunch').onclick = async () => {
+  const target = $('testTargetApp').value.trim() || 'notepad.exe';
+  $('testLog').textContent += `\n[${new Date().toLocaleTimeString()}] Executing verification launch test on '${target}'...`;
+  try {
+    const res = await api.appControlTestLaunch({ targetApp: target });
+    if (res && res.success) {
+      if (res.log) $('testLog').textContent = res.log.join('\n');
+      if (res.blocked) {
+        $('testStatusPill').textContent = 'VERIFIED BLOCKED';
+        $('testStatusPill').className = 'test-status-pill verified';
+        toast('SUCCESS: Application was blocked from opening!');
+      } else {
+        toast('NOTICE: App process started but was terminated.', true);
+      }
+    }
+  } catch (e) {
+    $('testLog').textContent += `\n[Error] Test launch check failed: ${e.message}`;
+  }
+};
+
+$('btnTestEnd').onclick = () => {
+  const target = $('testTargetApp').value.trim() || 'notepad.exe';
+  requestPassword(async (pwd) => {
+    $('testLog').textContent += `\n[${new Date().toLocaleTimeString()}] Ending test phase and restoring ${target}...`;
+    const res = await api.appControlTestEnd({ password: pwd, targetApp: target });
+    if (res && res.success) {
+      $('testStatusPill').textContent = 'Test: Ready';
+      $('testStatusPill').className = 'test-status-pill idle';
+      $('testNotice').innerHTML = `✅ <strong>TEST RESTORED:</strong> <code>${target}</code> is unblocked. You can open it normally again.`;
+      if (res.log) $('testLog').textContent = res.log.join('\n');
+      toast(res.message || 'Test phase ended.');
+      refreshAppControl();
+    } else {
+      toast((res && res.error) || 'Restore failed', true);
+    }
+  });
+};
+
+// Initial load
+(async () => {
+  try {
+    const info = await api.pathInfo();
+    $('pathLine').textContent = 'worker: ' + (info.dataDir || 'C:\\ProgramData\\OMAgent');
+  } catch { }
+  updateLockUI();
+  refresh();
+  refreshLog();
+  refreshAppControl();
+  setInterval(refresh, 3000);
+})();
+</script>
+</body>
+</html>
